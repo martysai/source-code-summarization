@@ -5,6 +5,8 @@ set -e
 pip install --user fairseq==0.6.2
 pip install --user tensorboardX
 
+echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
+
 # todo: specify gpus
 [ -z "$CUDA_VISIBLE_DEVICES" ] && { echo "Must set export CUDA_VISIBLE_DEVICES="; exit 1; } || echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
 IFS=',' read -r -a GPUS <<< "$CUDA_VISIBLE_DEVICES"
