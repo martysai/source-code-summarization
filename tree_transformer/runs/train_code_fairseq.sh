@@ -195,8 +195,10 @@ export train_command="${train_command:-fairseq-train}"
 
 if [ ${DISTRIBUTED} == "y" ]; then
     if [ ${NUM_GPU} -gt 1 ]; then
+		echo "NUM GPU = $NUM_GPU > 1"
         export init_command="python ${tee_begin} -m torch.distributed.launch ${dis_port_str} --nproc_per_node ${NUM_GPU} $(which fairseq-train) ${DATA_DIR} --ddp-backend=${DDP_BACKEND} ${nobarstr} ${nrank_str}"
     else
+		echo "NUM GPU = $NUM_GPU > 1"
         export init_command="$(which fairseq-train) ${tee_begin} ${DATA_DIR} --ddp-backend=${DDP_BACKEND} ${nobarstr} "
     fi
 else
