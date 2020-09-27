@@ -131,7 +131,7 @@ export weight_dropout="${weight_dropout:-0}"
 export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
 export log_interval="${log_interval:-100}"
 
-export TRAIN_DIR=${TRAIN_DIR_PREFIX}/${ARCH}-${HPARAMS}-b${MAXTOKENS}-gpu${NUM_GPU}-upfre{UPDATE_FREQ}-${fp16}fp16-id${ID}
+export TRAIN_DIR=${TRAIN_DIR_PREFIX}/${ARCH}-${HPARAMS}-b${MAXTOKENS}-gpu${NUM_GPU}-upfre${UPDATE_FREQ}-${fp16}fp16-id${ID}
 export TFBOARD_DIR=${TRAIN_DIR}/tfboard
 
 # todo: specify distributed and fp16
