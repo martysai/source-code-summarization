@@ -392,10 +392,10 @@ class NstackMergeTree2SeqTranslationTask(DPTree2SeqSeparateTranslationTask):
                         raise FileNotFoundError('Dataset not found: {} ({})'.format(split, data_path))
 
                 for modality in src_datasets_dict.keys():
-                    print("self.src_dict:", self.src_dict)
-                    print("indexed_dataset(f'{prefix}{src}.{modality}', self.src_dict):", indexed_dataset(f'{prefix}{src}.{modality}', self.src_dict))
+                    # print("self.src_dict:", self.src_dict)
+                    # print("indexed_dataset(f'{prefix}{src}.{modality}', self.src_dict):", indexed_dataset(f'{prefix}{src}.{modality}', self.src_dict))
                     src_datasets_dict[modality].append(indexed_dataset(f'{prefix}{src}.{modality}', self.src_dict))
-                    print("src_datasets_dict[modality][0]:", src_datasets_dict[modality][0])
+                    # print("src_datasets_dict[modality][0]:", src_datasets_dict[modality][0])
 
                 # src_datasets.append(indexed_dataset(prefix + src, self.src_dict))
                 tgt_datasets.append(indexed_dataset(prefix + tgt, self.tgt_dict))
@@ -407,7 +407,7 @@ class NstackMergeTree2SeqTranslationTask(DPTree2SeqSeparateTranslationTask):
 
         assert len(src_datasets_dict[NSTACK_KEYS[0]]) == len(tgt_datasets)
 
-        print("len(tgt_datasets):", len(tgt_datasets))
+        # print("len(tgt_datasets):", len(tgt_datasets))
         if len(tgt_datasets) == 1:
             # src_dataset, tgt_dataset = src_datasets[0], tgt_datasets[0]
             src_dataset_dict = {k: v[0] for k, v in src_datasets_dict.items()}
@@ -419,8 +419,8 @@ class NstackMergeTree2SeqTranslationTask(DPTree2SeqSeparateTranslationTask):
             src_dataset_dict = {k: ConcatDataset(v, sample_ratios) for k, v in src_datasets_dict.items()}
             tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
 
-        print("len(src_dataaet_dict.keys()):", len(src_dataset_dict.keys()))
-        print("src_dataset_dict['leaves']:", src_dataset_dict['leaves'])
+        # print("len(src_dataaet_dict.keys()):", len(src_dataset_dict.keys()))
+        # print("src_dataset_dict['leaves']:", src_dataset_dict['leaves'])
         # src_sizes = src_dataset_dict['nodes'].sizes
         # src_sizes = src_dataset_dict['nodes'].sizes.reshape(-1, 2).sum(-1)
         leave_shape = src_dataset_dict['leaves'].sizes
