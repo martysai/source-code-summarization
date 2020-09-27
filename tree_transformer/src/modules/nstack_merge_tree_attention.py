@@ -105,7 +105,7 @@ class MergeWeightMask(object):
         b = bh // h
         if pad_mask is not None:
             attn_weights = attn_weights.view(b, h, tq, tk)
-            attn_weights = attn_weights.float().masked_fill(pad_mask, float('-inf')).type_as(attn_weights)
+            attn_weights = attn_weights.float().masked_fill(pad_mask.type(torch.BoolTensor).to(pad_mask.device), float('-inf')).type_as(attn_weights)
             attn_weights = attn_weights.view(bh, tq, tk)
         return attn_weights
 
@@ -137,7 +137,7 @@ class MergeWeightMask(object):
         b = bh // h
         if pad_mask is not None:
             attn_weights = attn_weights.view(b, h, tq, tk)
-            attn_weights = attn_weights.float().masked_fill(pad_mask, float('-inf')).type_as(attn_weights)
+            attn_weights = attn_weights.float().masked_fill(pad_mask.type(torch.BoolTensor).to(pad_mask.device), float('-inf')).type_as(attn_weights)
             attn_weights = attn_weights.view(bh, tq, tk)
         return attn_weights
 
@@ -180,6 +180,7 @@ class MergeWeightMask(object):
             # todo: leave_mask: [b, 1, m, n]
             l_rg = leave_range.view(1, 1, n)
             l_npad = (l_rg < spans[:, :, :1]) | (l_rg > spans[:, :, 1:])
+            l_npad = l_npad.type(torch.ByteTensor).to(device)
             l_npad |= node_pad.view(b, m, 1)
             l_npad |= key_pad.view(b, 1, n)
             l_npad = l_npad.view(b, 1, m, n)
@@ -330,7 +331,7 @@ class MergeHierarchicalEmbedding(nn.Embedding):
         bh, n_, m, _ = mask.size()
         b = bh // self.num_heads
         with torch.no_grad():
-            fl_mask = torch.flip(mask, [2]).squeeze_(-1)
+            fl_mask = torch.flip(mask.type(torch.ByteTensor).to(spans.device), [2]).squeeze_(-1)
             if self.take_full_dim:
                 fl_mask = fl_mask.view(b, self.num_heads, m, n, m)[:, 0]
 
