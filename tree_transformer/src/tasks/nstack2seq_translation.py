@@ -415,6 +415,7 @@ class NstackMergeTree2SeqTranslationTask(DPTree2SeqSeparateTranslationTask):
             src_dataset_dict = {k: ConcatDataset(v, sample_ratios) for k, v in src_datasets_dict.items()}
             tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
 
+        print("len(src_dataaet_dict.keys()):", len(src_dataset_dict.keys()))
         # src_sizes = src_dataset_dict['nodes'].sizes
         # src_sizes = src_dataset_dict['nodes'].sizes.reshape(-1, 2).sum(-1)
         leave_shape = src_dataset_dict['leaves'].sizes

@@ -5,11 +5,11 @@ export user_dir=${ROOT_DIR}/${PROJDIR}
 export RAW_DIR=${ROOT_DIR}/raw_code_data
 # export BPE=${RAW_DIR}/code
 export train_r=${RAW_DIR}/train.tree-cdds
-export valid_r=${RAW_DIR}/train.tree-cdds
-export test_r=${RAW_DIR}/train.tree-cdds
+export valid_r=${RAW_DIR}/valid.tree-cdds
+export test_r=${RAW_DIR}/test.tree-cdds
 export OUT=${ROOT_DIR}/code_data_fairseq
 rm -rf $OUT
-python -m tree_transformer.preprocess_nstack2seq_merge \
+python -m tree_transformer.preprocess_code_nstack2seq_merge \
 --source-lang "cd" --target-lang "ds" \
 --user-dir ${user_dir} \
 --trainpref ${train_r} \
