@@ -8,6 +8,7 @@ pip install --user tensorboardX
 # todo: specify gpus
 [ -z "$CUDA_VISIBLE_DEVICES" ] && { echo "Must set export CUDA_VISIBLE_DEVICES="; exit 1; } || echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
 IFS=',' read -r -a GPUS <<< "$CUDA_VISIBLE_DEVICES"
+echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
 export NUM_GPU=${#GPUS[@]}
 
 export ROOT_DIR=`pwd`

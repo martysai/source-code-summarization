@@ -1,3 +1,4 @@
 raw_code_data/*
 code_data_fairseq/*
 tree_transformer/__pycache__
+train_tree_transformer/*
