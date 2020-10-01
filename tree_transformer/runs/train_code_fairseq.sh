@@ -183,7 +183,7 @@ export tee_end=""
 
 if [ $out_log == "y" ]; then
     echo "Printing logs to log file ${LOGFILE}"
-    export tee_begin=" -u "
+    # export tee_begin=" -u "
     export tee_end=" | tee ${LOGFILE}"
     touch ${LOGFILE}
 fi
