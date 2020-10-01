@@ -6,4 +6,8 @@ export MAX_UPDATE=61000
 export UPDATE_FREQ=1
 export att_dropout=0.2
 export DROPOUT=0.3 &&
+
+echo "TT CODE TRAIN"
+echo "CUDA VISIBLE DEVICES = $CUDA_VISIBLE_DEVICES"
+
 bash run_code_nstack_nmt.sh dwnstack_merge2seq_node_iwslt_onvalue_base_upmean_mean_mlesubenc_allcross_hier $CUDA_VISIBLE_DEVICES
