@@ -147,7 +147,7 @@ class MergeWeightMask(object):
         node_pad_mask = cls.build_mask_subtree_only(device, num_heads, key_pad, node_pad, spans, b, t, n, m, **kwargs)
         # leave_pad_mask:       [b, 1, n, n + m]
         # node_pad_mask:        [b, 1, m, n + m]
-        pad_mask = torch.cat([leave_pad_mask, node_pad_mask.type(torch.ByteTensor).to(leave_pad_mask.device)], 2)
+        pad_mask = torch.cat([leave_pad_mask.type(torch.BoolTensor).to(leave_pad_mask.device), node_pad_mask.type(torch.BoolTensor).to(leave_pad_mask.device)], 2)
         return pad_mask
 
     @classmethod
