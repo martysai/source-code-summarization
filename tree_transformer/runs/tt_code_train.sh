@@ -7,7 +7,7 @@ export UPDATE_FREQ=1
 export att_dropout=0.2
 export DROPOUT=0.3 &&
 
-export CUDA_VISIBLE_DEVICES=`nvidia-smi --query-gpu=index --format=csv,noheader | tr '\n' ',' | sed 's/,$/\n/'
+export CUDA_VISIBLE_DEVICES=`nvidia-smi --query-gpu=index --format=csv,noheader | tr '\n' ',' | sed 's/,$/\n/'`
 echo "TT CODE TRAIN"
 echo "CUDA VISIBLE DEVICES = $CUDA_VISIBLE_DEVICES"
 
