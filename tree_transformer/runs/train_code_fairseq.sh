@@ -18,7 +18,7 @@ export user_dir=${ROOT_DIR}/${PROJDIR}/src
 
 export PROBLEM="${PROBLEM:-translate_ende_wmt_bpe32k}"
 
-export RAW_DATA_DIR=${ROOT_DIR}/raw_data_fairseq/${PROBLEM}
+export RAW_DATA_DIR=${ROOT_DIR}/raw_code_data/${PROBLEM}
 export DATA_DIR=${ROOT_DIR}/code_data_fairseq/${PROBLEM}
 export TRAIN_DIR_PREFIX=${ROOT_DIR}/train_tree_transformer/${PROBLEM}
 
@@ -95,7 +95,7 @@ export DDP_BACKEND="${DDP_BACKEND:-c10d}"
 export LRSRINK="${LRSRINK:-0.1}"
 export MAX_LR="${MAX_LR:-0.001}"
 export WORKERS="${WORKERS:-0}"
-export INFER="${INFER:-y}"
+export INFER="${INFER:-n}"
 export DISTRIBUTED="${DISTRIBUTED:-y}"
 export CRITERION="${CRITERION:-label_smoothed_cross_entropy}"
 
@@ -198,7 +198,7 @@ if [ ${DISTRIBUTED} == "y" ]; then
 		echo "NUM GPU = $NUM_GPU > 1"
         export init_command="python ${tee_begin} -m torch.distributed.launch ${dis_port_str} --nproc_per_node ${NUM_GPU} $(which fairseq-train) ${DATA_DIR} --ddp-backend=${DDP_BACKEND} ${nobarstr} ${nrank_str}"
     else
-		echo "NUM GPU = $NUM_GPU > 1"
+		echo "NUM GPU = $NUM_GPU = 1"
         export init_command="$(which fairseq-train) ${tee_begin} ${DATA_DIR} --ddp-backend=${DDP_BACKEND} ${nobarstr} "
     fi
 else
