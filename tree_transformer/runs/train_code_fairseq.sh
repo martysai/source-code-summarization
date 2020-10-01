@@ -2,9 +2,6 @@
 
 set -e
 
-pip install --user fairseq==0.6.2
-pip install --user tensorboardX
-
 echo "CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
 
 # todo: specify gpus
