@@ -174,13 +174,15 @@ class MergeWeightMask(object):
         with torch.no_grad():
             key_pad = key_pad if key_pad is not None else torch.zeros(b, n, device=device)#.byte()
             node_pad = node_pad if node_pad is not None else torch.zeros(b, m, device=device)#.byte()
+            key_pad = key_pad.type(torch.ByteTensor).to(device)
+            node_pad = node_pad.type(torch.ByteTensor).to(device)
 
             leave_range = torch.arange(0, n, dtype=spans.dtype, device=spans.device)
 
             # todo: leave_mask: [b, 1, m, n]
             l_rg = leave_range.view(1, 1, n)
             l_npad = (l_rg < spans[:, :, :1]) | (l_rg > spans[:, :, 1:])
-            # l_npad = l_npad.type(torch.ByteTensor).to(device)
+            l_npad = l_npad.type(torch.ByteTensor).to(device)
             l_npad |= node_pad.view(b, m, 1)
             l_npad |= key_pad.view(b, 1, n)
             l_npad = l_npad.view(b, 1, m, n)
