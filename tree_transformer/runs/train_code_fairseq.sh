@@ -40,7 +40,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 #	export
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
 	export WARMUP="${WARMUP:-4000}"
-	export LR="${LR:-0.0007}"
+	export LR="${LR:-0.00021}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY="${WDECAY:-0.0}"
@@ -65,7 +65,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export WARMUP_INIT=1e-07
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
 	export WARMUP="${WARMUP:-4000}"
-	export LR="${LR:-0.0007}"
+	export LR="${LR:-0.00021}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY=0.0
