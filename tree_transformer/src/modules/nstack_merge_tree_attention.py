@@ -180,7 +180,7 @@ class MergeWeightMask(object):
             # todo: leave_mask: [b, 1, m, n]
             l_rg = leave_range.view(1, 1, n)
             l_npad = (l_rg < spans[:, :, :1]) | (l_rg > spans[:, :, 1:])
-            # l_npad = l_npad.type(torch.ByteTensor).to(device)
+            l_npad = l_npad.type(torch.ByteTensor).to(device)
             l_npad |= node_pad.view(b, m, 1)
             l_npad |= key_pad.view(b, 1, n)
             l_npad = l_npad.view(b, 1, m, n)
