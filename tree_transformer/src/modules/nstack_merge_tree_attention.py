@@ -187,6 +187,8 @@ class MergeWeightMask(object):
             l_npad |= key_pad.view(b, 1, n)
             l_npad = l_npad.view(b, 1, m, n)
 
+            assert not torch.isnan(l_npad).any()
+
             # todo: node_mask:  [b, 1, m, m]
             n_rg = leave_range.view(1, 1, n)
             n_leave = (n_rg >= spans[:, :, :1]) ^ (n_rg > spans[:, :, 1:])
