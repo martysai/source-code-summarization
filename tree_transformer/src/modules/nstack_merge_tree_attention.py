@@ -335,6 +335,7 @@ class MergeHierarchicalEmbedding(nn.Embedding):
         with torch.no_grad():
             fl_mask = torch.flip(mask.type(torch.ByteTensor).to(spans.device), [2]).squeeze_(-1)
             fl_mask = fl_mask.type(torch.BoolTensor).to(spans.device)
+            assert not torch.isnan(fl_mask).any()
             if self.take_full_dim:
                 fl_mask = fl_mask.view(b, self.num_heads, m, n, m)[:, 0]
 
