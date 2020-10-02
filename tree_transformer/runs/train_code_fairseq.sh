@@ -34,7 +34,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 
 	export OPTIM=adam
 	export ADAMBETAS='(0.9, 0.98)'
-	export CLIPNORM=3.0
+	export CLIPNORM=0.0
 	export LRSCHEDULE=inverse_sqrt
 	export WARMUP_INIT=1e-07
 #	export
@@ -60,7 +60,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 
 	export OPTIM="${OPTIM:-adam}"
 	export ADAMBETAS='(0.9, 0.98)'
-	export CLIPNORM=3.0
+	export CLIPNORM=0.0
 	export LRSCHEDULE=inverse_sqrt
 	export WARMUP_INIT=1e-07
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
@@ -111,7 +111,7 @@ export src="${src:-cd}"
 export optim_text="${optim_text:---optimizer ${OPTIM} --clip-norm ${CLIPNORM} }"
 export scheduler_text="${scheduler_text:---lr-scheduler ${LRSCHEDULE} --warmup-init-lr  ${WARMUP_INIT} --warmup-updates ${WARMUP} }"
 
-export fp16="${fp16:-1}"
+export fp16="${fp16:-0}"
 export rm_srceos="${rm_srceos:-0}"
 export rm_lastpunct="${rm_lastpunct:-0}"
 export nobar="${nobar:-1}"
