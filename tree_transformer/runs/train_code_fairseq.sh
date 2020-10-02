@@ -16,7 +16,7 @@ export ROOT_DIR="${ROOT_DIR/\/tree_transformer\/runs/}"
 
 export user_dir=${ROOT_DIR}/${PROJDIR}/src
 
-export PROBLEM="${PROBLEM:-translate_ende_wmt_bpe32k}"
+export PROBLEM="${PROBLEM:-source-code-summarization}"
 
 export RAW_DATA_DIR=${ROOT_DIR}/raw_code_data/${PROBLEM}
 export DATA_DIR=${ROOT_DIR}/code_data_fairseq/${PROBLEM}
@@ -69,7 +69,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY=0.9
-	export LB_SMOOTH=0.1
+	export LB_SMOOTH=0.05
 	export MAXTOKENS="${MAXTOKENS:-32768}" # 4096 -- 8gpus, 32768 -- 1gpu
 	export UPDATE_FREQ="${UPDATE_FREQ:-1}"
 	export MAX_UPDATE="${MAX_UPDATE:-2000}"
