@@ -43,7 +43,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export LR="${LR:-0.00007}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
-	export WDECAY="${WDECAY:-0.0}"
+	export WDECAY="${WDECAY:-0.9}"
 	export LB_SMOOTH=0.1
 	export MAXTOKENS="${MAXTOKENS:-4096}" # 8gpus
 	export UPDATE_FREQ="${UPDATE_FREQ:-8}"
@@ -68,7 +68,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export LR="${LR:-0.00007}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
-	export WDECAY=0.0
+	export WDECAY=0.9
 	export LB_SMOOTH=0.1
 	export MAXTOKENS="${MAXTOKENS:-4096}" # 8gpus
 	export UPDATE_FREQ="${UPDATE_FREQ:-1}"
