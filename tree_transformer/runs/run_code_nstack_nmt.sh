@@ -35,7 +35,7 @@ export MAXTOKENS="${MAXTOKENS:-1024}"
 export UPDATE_FREQ="${UPDATE_FREQ:-1}"
 export RM_EXIST_DIR="${RM_EXIST_DIR:-n}"
 
-export INFER="${INFER:-y}"
+export INFER="${INFER:-n}"
 export max_pos="${max_pos:-1024}"
 export max_tgt_pos="${max_tgt_pos:-1024}"
 export more_params="${more_params:-}"
@@ -56,7 +56,7 @@ export log_file=${log_dir}/${PROBLEM}-${arch}-${ID}.log
 export MAX_UPDATE="${MAX_UPDATE:-45000}"
 export nobar=1
 
-export LR="${LR:-0.0005}"
+export LR="${LR:-0.00005}"
 export DROPOUT="${DROPOUT:-0.3}"
 export WDECAY="${WDECAY:-0.0001}"
 export AVG_NUM=10
