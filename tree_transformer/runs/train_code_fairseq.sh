@@ -45,8 +45,8 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY="${WDECAY:-0.9}"
 	export LB_SMOOTH=0.1
-	export MAXTOKENS="${MAXTOKENS:-32768}" # 4096 -- 8gpus, 32768 -- 1gpu
-	export UPDATE_FREQ="${UPDATE_FREQ:-1}" # 8 -- 8gpus, 1 -- gpu
+	export MAXTOKENS="${MAXTOKENS:-65536}" # 4096 -- 8gpus, 32768 -- 1gpu
+	export UPDATE_FREQ="${UPDATE_FREQ:-64}" # 8 -- 8gpus, 1 -- gpu
 #	export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
 
 elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
@@ -70,8 +70,8 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY=0.9
 	export LB_SMOOTH=0.05
-	export MAXTOKENS="${MAXTOKENS:-32768}" # 4096 -- 8gpus, 32768 -- 1gpu
-	export UPDATE_FREQ="${UPDATE_FREQ:-1}"
+	export MAXTOKENS="${MAXTOKENS:-65536}" # 4096 -- 8gpus, 32768 -- 1gpu
+	export UPDATE_FREQ="${UPDATE_FREQ:-64}"
 	export MAX_UPDATE="${MAX_UPDATE:-2000}"
 	export LEFT_PAD_SRC="${LEFT_PAD_SRC:-True}"
 #	export LEFT_PAD_SRC=True
