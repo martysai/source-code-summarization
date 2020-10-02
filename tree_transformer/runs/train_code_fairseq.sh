@@ -59,7 +59,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
     export CRITERION="${CRITERION:-classification_cross_entropy}"
 
 	export OPTIM="${OPTIM:-adam}"
-	export ADAMBETAS='(0.9, 0.98)'
+	export ADAMBETAS='(0.85, 0.9)'
 	export CLIPNORM=2.5
 	export LRSCHEDULE=inverse_sqrt
 	export WARMUP_INIT=1e-07
