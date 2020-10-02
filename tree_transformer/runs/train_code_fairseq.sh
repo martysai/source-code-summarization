@@ -45,8 +45,8 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY="${WDECAY:-0.9}"
 	export LB_SMOOTH=0.1
-	export MAXTOKENS="${MAXTOKENS:-4096}" # 8gpus
-	export UPDATE_FREQ="${UPDATE_FREQ:-8}"
+	export MAXTOKENS="${MAXTOKENS:-32768}" # 4096 -- 8gpus, 32768 -- 1gpu
+	export UPDATE_FREQ="${UPDATE_FREQ:-1}" # 8 -- 8gpus, 1 -- gpu
 #	export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
 
 elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
@@ -70,7 +70,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY=0.9
 	export LB_SMOOTH=0.1
-	export MAXTOKENS="${MAXTOKENS:-4096}" # 8gpus
+	export MAXTOKENS="${MAXTOKENS:-32768}" # 4096 -- 8gpus, 32768 -- 1gpu
 	export UPDATE_FREQ="${UPDATE_FREQ:-1}"
 	export MAX_UPDATE="${MAX_UPDATE:-2000}"
 	export LEFT_PAD_SRC="${LEFT_PAD_SRC:-True}"
@@ -96,7 +96,7 @@ export LRSRINK="${LRSRINK:-0.1}"
 export MAX_LR="${MAX_LR:-0.001}"
 export WORKERS="${WORKERS:-0}"
 export INFER="${INFER:-n}"
-export DISTRIBUTED="${DISTRIBUTED:-y}"
+export DISTRIBUTED="${DISTRIBUTED:-n}" # disable distributed
 export CRITERION="${CRITERION:-label_smoothed_cross_entropy}"
 
 export VALID_SET="${VALID_SET:-valid}"
