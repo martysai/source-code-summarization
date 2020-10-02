@@ -1,5 +1,5 @@
 export MAXTOKENS=1024
-export INFER=y
+export INFER=n
 export dis_port_str=--master_port=6102
 export problem=nstack_merge_summ_cdds_65k
 export MAX_UPDATE=61000
