@@ -39,7 +39,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export WARMUP_INIT=1e-07
 #	export
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
-	export WARMUP="${WARMUP:-4000}"
+	export WARMUP="${WARMUP:-16000}"
 	export LR="${LR:-0.00007}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
@@ -64,7 +64,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export LRSCHEDULE=inverse_sqrt
 	export WARMUP_INIT=1e-07
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
-	export WARMUP="${WARMUP:-4000}"
+	export WARMUP="${WARMUP:-16000}"
 	export LR="${LR:-0.00007}"
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
