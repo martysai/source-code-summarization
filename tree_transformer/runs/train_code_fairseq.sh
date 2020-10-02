@@ -33,7 +33,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
     export TASK="${TASK:-translation}"
 
 	export OPTIM=adam
-	export ADAMBETAS='(0.9, 0.98)'
+	export ADAMBETAS='(0.85, 0.9)'
 	export CLIPNORM=2.5
 	export LRSCHEDULE=inverse_sqrt
 	export WARMUP_INIT=1e-07
@@ -263,7 +263,7 @@ else
 	--update-freq ${UPDATE_FREQ} \
 	--criterion ${CRITERION} \
 	--label-smoothing ${LB_SMOOTH} \
-	--adam-betas '(0.9, 0.98)' \
+	--adam-betas '(0.85, 0.9)' \
 	--max-tokens ${MAXTOKENS} \
 	--left-pad-source ${LEFT_PAD_SRC} \
 	--max-update ${MAX_UPDATE} \
