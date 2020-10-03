@@ -206,7 +206,7 @@ grep ^H ${GEN_OUT} | cut -f3- > ${HYPO}
 
 
 
-$(which fairseq-score) --sys ${HYPO} --ref ${REF}  --tensorboard-dir bleu-dir > ${BLEU_OUT}
+$(which fairseq-score) --sys ${HYPO} --ref ${REF}  --tensorboard-logdir bleu-dir > ${BLEU_OUT}
 echo "REF RESULTS:"
 cat ${REF}
 echo "BLEU RESULTS:"
