@@ -41,6 +41,8 @@ export TESTSET="${TESTSET:-newstest2014}"
 
 export INFERMODE="${INFERMODE:-avg}"
 export INFER_DIR=${TRAIN_DIR}/infer
+echo "INFER_DIR = $INFER_DIR"
+
 mkdir -p ${INFER_DIR}
 
 # creating traindir for checkpoints and logging
