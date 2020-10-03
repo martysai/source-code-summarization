@@ -38,6 +38,7 @@ export TGT_LANG="${TGT_LANG:-ds}"
 export SRC_LANG="${SRC_LANG:-cd}"
 export TESTSET="${TESTSET:-newstest2014}"
 
+export TRAIN_DIR=${TRAIN_DIR_PREFIX}/${ARCH}-${HPARAMS}-b${MAXTOKENS}-gpu${NUM_GPU}-upfre${UPDATE_FREQ}-${fp16}fp16-id${ID}
 
 export INFERMODE="${INFERMODE:-avg}"
 export INFER_DIR=${TRAIN_DIR}/infer
