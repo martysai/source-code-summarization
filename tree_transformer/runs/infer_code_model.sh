@@ -35,7 +35,7 @@ fi
 #export EPOCHS="${EPOCHS:-300}"
 export PROBLEM="${PROBLEM:-nstack_merge_summ_cdds_65k}"
 
-export RAW_DATA_DIR=${ROOT_DIR}/raw_data_fairseq/${PROBLEM}
+export RAW_DATA_DIR=${ROOT_DIR}/raw_code_data/${PROBLEM}
 export DATA_DIR=${ROOT_DIR}/code_data_fairseq/${PROBLEM}
 export TRAIN_DIR_PREFIX=${ROOT_DIR}/train_tree_transformer/${PROBLEM}
 
@@ -201,7 +201,12 @@ grep ^H ${GEN_OUT} | cut -f3- > ${HYPO}
 
 
 $(which fairseq-score) --sys ${HYPO} --ref ${REF} > ${BLEU_OUT}
+echo "REF RESULTS:"
+cat ${REF}
+echo "BLEU RESULTS:"
 cat ${BLEU_OUT}
+echo "HYPO RESULTS:"
+cat ${HYPO}
+echo "REF TW RESULTS:"
+cat ${REF_TW}
 echo ""
-
-
