@@ -238,8 +238,7 @@ if [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	--save-dir ${TRAIN_DIR} \
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
 	--nclasses ${NCLASSES} \
-	--patience 50 \
-	--scoring \
+	--eval-bleu \
 	${max_sent_valid} \
 	${extra_params} \
 	${fp16s}  ${rm_srceos_s} ${rm_lastpunct_s} | tee ${LOGFILE}"
@@ -271,8 +270,7 @@ else
 	--max-update ${MAX_UPDATE} \
 	--save-dir ${TRAIN_DIR} \
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
-	--patience 50 \
-	--scoring \
+	--eval-bleu \
 	${att_dropout_str} \
 	${weight_dropout_str} \
 	${tfboardstr} \
@@ -282,6 +280,8 @@ else
 	${extra_params} \
 	${fp16s}  ${rm_srceos_s} ${rm_lastpunct_s} ${tee_end}"
 fi
+
+# --patience 50 \
 
 echo "full command: "
 echo $full_command
