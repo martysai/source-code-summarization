@@ -35,7 +35,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export OPTIM=adam
 	export ADAMBETAS='(0.85, 0.9)'
 	export CLIPNORM=2.5
-	export LRSCHEDULE=inverse_sqrt
+	export LRSCHEDULE=cosine # previously inverse_sqrt
 	export WARMUP_INIT=1e-07
 #	export
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
@@ -61,7 +61,7 @@ elif [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	export OPTIM="${OPTIM:-adam}"
 	export ADAMBETAS='(0.85, 0.9)'
 	export CLIPNORM=2.5
-	export LRSCHEDULE=inverse_sqrt
+	export LRSCHEDULE=cosine # inverse_sqrt
 	export WARMUP_INIT=1e-07
 	# wamrup 4000 for 8 gpus, 16000 for 1 gpus
 	export WARMUP="${WARMUP:-16000}"
@@ -238,7 +238,8 @@ if [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	--save-dir ${TRAIN_DIR} \
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
 	--nclasses ${NCLASSES} \
-	--eval-bleu \
+	--scoring bleu \
+    --patience 50 \
 	${max_sent_valid} \
 	${extra_params} \
 	${fp16s}  ${rm_srceos_s} ${rm_lastpunct_s} | tee ${LOGFILE}"
@@ -270,7 +271,8 @@ else
 	--max-update ${MAX_UPDATE} \
 	--save-dir ${TRAIN_DIR} \
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
-	--eval-bleu \
+	--scoring bleu \
+	--patience 50 \
 	${att_dropout_str} \
 	${weight_dropout_str} \
 	${tfboardstr} \
