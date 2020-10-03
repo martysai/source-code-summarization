@@ -59,7 +59,7 @@ export nobar=1
 export LR="${LR:-0.00005}"
 export DROPOUT="${DROPOUT:-0.3}"
 export WDECAY="${WDECAY:-0.0001}"
-export AVG_NUM=10
+export AVG_NUM=5
 export LENPEN=1
 
 export ARCH=${arch}
