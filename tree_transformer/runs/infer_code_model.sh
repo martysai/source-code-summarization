@@ -40,7 +40,7 @@ export TESTSET="${TESTSET:-newstest2014}"
 
 export TRAIN_DIR=${TRAIN_DIR_PREFIX}/${ARCH}-${HPARAMS}-b${MAXTOKENS}-gpu${NUM_GPU}-upfre${UPDATE_FREQ}-${fp16}fp16-id${ID}
 
-export INFERMODE="${INFERMODE:-avg}"
+export INFERMODE="${INFERMODE:-best}"
 export INFER_DIR=${TRAIN_DIR}/infer
 echo "INFER_DIR = $INFER_DIR"
 
@@ -170,7 +170,7 @@ fi
 echo "Start generating"
 
 
-
+# make predictions
 export command="$(which fairseq-generate) ${DATA_DIR} \
     --task ${TASK} \
     --user-dir ${user_dir} \
@@ -206,7 +206,7 @@ grep ^H ${GEN_OUT} | cut -f3- > ${HYPO}
 
 
 
-$(which fairseq-score) --sys ${HYPO} --ref ${REF} > ${BLEU_OUT}
+$(which fairseq-score) --sys ${HYPO} --ref ${REF}  --tensorboard-dir > ${BLEU_OUT}
 echo "REF RESULTS:"
 cat ${REF}
 echo "BLEU RESULTS:"
