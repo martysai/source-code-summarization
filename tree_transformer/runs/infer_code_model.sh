@@ -21,17 +21,6 @@ export ROOT_DIR="${ROOT_DIR/\/tree_transformer\/runs/}"
 
 export user_dir=${ROOT_DIR}/${PROJDIR}/src
 
-
-
-if [ -d ${TRAIN_DIR} ]; then
-	# if train exists
-    echo "directory train exists!: ${TRAIN_DIR}"
-else
-    echo "directory train not exists!: ${TRAIN_DIR}"
-    exit 1
-fi
-
-
 #export EPOCHS="${EPOCHS:-300}"
 export PROBLEM="${PROBLEM:-nstack_merge_summ_cdds_65k}"
 
@@ -53,6 +42,20 @@ export TESTSET="${TESTSET:-newstest2014}"
 export INFERMODE="${INFERMODE:-avg}"
 export INFER_DIR=${TRAIN_DIR}/infer
 mkdir -p ${INFER_DIR}
+
+# creating traindir for checkpoints and logging
+# arch has been set up in run_nstack...
+# 
+export TRAIN_DIR=${TRAIN_DIR_PREFIX}/${ARCH}-${HPARAMS}-b${MAXTOKENS}-gpu${NUM_GPU}-upfre${UPDATE_FREQ}-${fp16}fp16-id${ID}
+
+
+if [ -d ${TRAIN_DIR} ]; then
+	# if train exists
+    echo "directory train exists!: ${TRAIN_DIR}"
+else
+    echo "directory train not exists!: ${TRAIN_DIR}"
+    exit 1
+fi
 
 # generate parameters
 
