@@ -44,7 +44,7 @@ if [ ${HPARAMS} == "transformer_base" ]; then
 	export MIN_LR=1e-09
 	export DROPOUT="${DROPOUT:-0.1}"
 	export WDECAY="${WDECAY:-0.9}"
-	export LB_SMOOTH=0.1
+	export LB_SMOOTH=0.05
 	export MAXTOKENS="${MAXTOKENS:-65536}" # 4096 -- 8gpus, 32768 -- 1gpu
 	export UPDATE_FREQ="${UPDATE_FREQ:-64}" # 8 -- 8gpus, 1 -- gpu
 #	export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
@@ -116,7 +116,7 @@ export rm_srceos="${rm_srceos:-0}"
 export rm_lastpunct="${rm_lastpunct:-0}"
 export nobar="${nobar:-1}"
 export shareemb="${shareemb:-1}"
-export shareemb_dec="${shareemb_dec:-0}"
+export shareemb_dec="${shareemb_dec:-1}"
 export usetfboard="${usetfboard:-1}"
 
 export dis_port_str="${dis_port_str:-}"
@@ -124,8 +124,8 @@ export nrank_str="${nrank_str:-}"
 
 export max_sent_valid="${max_sent_valid:-}"
 
-export att_dropout="${att_dropout:-0}"
-export weight_dropout="${weight_dropout:-0}"
+export att_dropout="${att_dropout:-0.03}"
+export weight_dropout="${weight_dropout:-0.03}"
 #--max-sentences-valid 1
 
 export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
