@@ -44,7 +44,7 @@ export more_params="${more_params:-}"
 #    export extra_params="--append-eos-to-target --max-source-positions ${max_pos} --max-target-positions ${max_tgt_pos}"
 export extra_params="--append-eos-to-target ${more_params} --max-source-positions ${max_pos} --max-target-positions ${max_tgt_pos}"
 
-export ID=${id}msp${max_pos}default
+export ID=${id}msp${max_pos}default-final
 export DDP_BACKEND="${DDP_BACKEND:-no_c10d}"
 
 export out_log="${out_log:-y}"
