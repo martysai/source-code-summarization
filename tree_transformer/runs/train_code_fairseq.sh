@@ -125,7 +125,7 @@ export nrank_str="${nrank_str:-}"
 export max_sent_valid="${max_sent_valid:-}"
 
 export att_dropout="${att_dropout:-0.03}"
-export weight_dropout="${weight_dropout:-0.00}"
+export weight_dropout="${weight_dropout:-0}"
 #--max-sentences-valid 1
 
 export LEFT_PAD_SRC="${LEFT_PAD_SRC:-False}"
