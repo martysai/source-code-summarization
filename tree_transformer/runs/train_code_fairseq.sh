@@ -239,7 +239,7 @@ if [ ${HPARAMS} == "transformer_base_stt2" ]; then
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
 	--nclasses ${NCLASSES} \
 	--patience 50 \
-	--eval-bleu \
+	--scoring \
 	${max_sent_valid} \
 	${extra_params} \
 	${fp16s}  ${rm_srceos_s} ${rm_lastpunct_s} | tee ${LOGFILE}"
@@ -272,7 +272,7 @@ else
 	--save-dir ${TRAIN_DIR} \
 	--keep-last-epochs ${KEEP_LAS_CHECKPOINT} \
 	--patience 50 \
-	--eval-bleu \
+	--scoring \
 	${att_dropout_str} \
 	${weight_dropout_str} \
 	${tfboardstr} \
