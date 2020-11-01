@@ -78,7 +78,7 @@ def get_pre_post_comments(fun, code_lines):
     fun_line_first = fun.first_token.start[0] - 1
     fun_line_last = fun.last_token.end[0] - 1
     if (fun_line_first >= 2 and len(code_lines[fun_line_first - 1].strip()) >= 1 and \
-        code_lines[fun_line_first - 1].strip()[0] == "#" \ 
+        code_lines[fun_line_first - 1].strip()[0] == "#" \
         and code_lines[fun_line_first-2].strip() == "") or \
         (fun_line_first == 1 and len(code_lines[fun_line_first - 1].strip()) >= 1 and \
         code_lines[fun_line_first - 1].strip()[0] == "#"):
