@@ -1,5 +1,9 @@
 python150k/*tar*
 python150k/*txt
+python150k/data/
+python150k/data/*
+transcoder/model_cpp_python.pth
+python150k/sc*
 tree_transformer_info/*
 raw_code_data/*
 code_data_fairseq/*
