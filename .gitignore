@@ -10,3 +10,6 @@ code_data_fairseq/*
 tree_transformer/__pycache__
 train_tree_transformer/*
 notebooks/.ipynb_checkpoints
+notebooks/__pycache__
+notebooks/new_files
+python150k/process_data_nadya.py
