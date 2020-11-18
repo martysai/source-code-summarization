@@ -14,3 +14,11 @@ conda create -n scs python=3.7
 conda activate scs
 pip install -r requirements.txt
 ```
+Install linter with:
+```
+pip install flake8
+```
+To run formatter execute from the source folder:
+```
+bash scripts/yapf.sh
+```
