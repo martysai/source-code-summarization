@@ -115,7 +115,7 @@ def get_tokens(
 
 
 # Return comments before function
-def get_pre_comments(
+def get_previous_comments(
         fun: ast.FunctionDef,
         code_lines: List[str]) -> str:
     """
@@ -140,10 +140,16 @@ def get_pre_comments(
 
 
 def collect_docstrings(
-        filename,
-        args):
+        filename: str,
+        args: argparse.ArgumentParser) -> Tuple[List[str], List[str]]:
     """
-    Read functions descriptions from a file.
+    Read an 2 unparallel corpuses: functions and docstrings.
+    ---
+    Returns:
+        functions: List[str],
+            Tokenized function corpus.
+        comments: List[str],
+            Tokenized docstring corpus.
     """
     if args.verbose:
         print("Running collect_docstrings")
@@ -159,7 +165,7 @@ def collect_docstrings(
     for fun_ind, fun in enumerate(ast.iter_child_nodes(astree)):
         if isinstance(fun, ast.FunctionDef) and len(fun.body) > 0:
             a_fun, b_fun = fun.first_token.startpos, fun.last_token.endpos
-            precomment = get_pre_comments(fun, code_lines)
+            prev_comment = get_previous_comments(fun, code_lines)
             body_start = fun.body[0].first_token.startpos
             docstring = ast.get_docstring(fun)
             if args.verbose:
@@ -171,8 +177,9 @@ def collect_docstrings(
                 docstring = DOCSTRING_PREFIX + docstring + "\n"
             scope = [arg.arg for arg in fun.args.args]
             for node in ast.walk(fun):
-                if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
-                    scope.append(node.id)        
+                if isinstance(node, ast.Name) and \
+                   isinstance(node.ctx, ast.Store):
+                    scope.append(node.id)
             scope = set(scope)
             if len(scope) < 3:
                 print(f"Note: Function with fun.id = {fun.id} has too small scope.")
@@ -209,7 +216,8 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('Python150k preprocessing script',
+    parser = argparse.ArgumentParser(
+        'Python150k preprocessing script',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     set_script_arguments(parser)
