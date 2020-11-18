@@ -316,11 +316,15 @@ def main(args):
     if os.path.exists(args.dirname):
         shutil.rmtree(args.dirname)
 
-    comments_dir = "python150k_comments"
-    docstrings_dir = "python150k_docstrings"
-    functions_dir = "python150k_functions"
-    ord_nodes_dir = "python150k_ord_nodes"
-    tokens_dir = "python150k_tokens"
+    os.mkdir(args.dirname)
+    comments_dir = f"{args.dirname}/python150k_comments"
+    docstrings_dir = f"{args.dirname}/python150k_docstrings"
+    functions_dir = f"{args.dirname}/python150k_functions"
+    ord_nodes_dir = f"{args.dirname}/python150k_ord_nodes"
+    tokens_dir = f"{args.dirname}/python150k_tokens"
+    for directory in [comments_dir, docstrings_dir, ord_nodes_dir,
+                      functions_dir, tokens_dir]:
+        os.mkdir(directory)
 
     for filename in os.listdir(args.dirname):
         data = collect_data(filename, args)
