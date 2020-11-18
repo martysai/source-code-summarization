@@ -2,6 +2,8 @@ python150k/*tar*
 python150k/*txt
 python150k/data/
 python150k/data/*
+.vscode
+.vscode/*
 transcoder/model_cpp_python.pth
 python150k/sc*
 tree_transformer_info/*
