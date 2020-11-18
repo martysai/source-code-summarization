@@ -2,22 +2,31 @@ import argparse
 import ast
 import asttokens
 from io import BytesIO
+import numpy as np
+import os
+import pickle
 import re
+import shutil
 import tokenize
 from typing import Tuple, List
 
 
 SPECIAL_WORD = "JKMCFHNBVCXSDJ"
 SPACE_STOPWORDS = [' ', '\t', '\r', '\n', '\v', '\f']
-TOKENS_STOPWORDS = SPACE_STOPWORDS + ['utf-8']
+TOKENS_STOPWORDS = SPACE_STOPWORDS + ["utf-8"]
 DOCSTRING_PREFIX = "###DCSTR### "
 
 
 def set_script_arguments(parser):
+    # Main arguments
+    main_args = parser.add_argument_group("Main")
+    main_args.add_argument("--dirname", type=str, default="data",
+                           help="The directory to be processed.")
+
     # Runtime arguments
-    runtime = parser.add_argument_group('Environment')
-    runtime.add_argument('--verbose', type=bool, default=True,
-                         help='verbosity of this scripts')
+    runtime = parser.add_argument_group("Environment")
+    runtime.add_argument("--verbose", type=bool, default=True,
+                         help="The script verbosity.")
     return runtime
 
 
@@ -73,8 +82,6 @@ def get_tokens(
         remember_word: str = "",
         docstring: str = "") -> Tuple[list, int, list]:
     """
-    Returns tokens from default Python's tokenize.
-    ---
     code: str,
         Represents Python's file in string.
     special_word: str,
@@ -83,6 +90,16 @@ def get_tokens(
         Function name node.id.
     docstring: str,
         Is taken from ast.get_docstring. Usually is None.
+    ---
+    Returns:
+        tokens: List[str]
+            List of tokens in the current function
+        comments: List[str]
+            List of retrieved comments
+        special_idx: str
+            An index of special word occurence.
+        remember_idxs: List[str]
+            A list of remember word occurences.
     """
     global TOKENS_STOPWORDS
     tokens = []
@@ -111,10 +128,9 @@ def get_tokens(
             # common case -- readable docstring
             comments.append([comment_ind, token.string])
             comment_ind += 1
-    return tokens, special_idx, remember_idxs
+    return tokens, comments, special_idx, remember_idxs
 
 
-# Return comments before function
 def get_previous_comments(
         fun: ast.FunctionDef,
         code_lines: List[str]) -> str:
@@ -139,17 +155,16 @@ def get_previous_comments(
     return precomment
 
 
-def collect_docstrings(
+def collect_data(
         filename: str,
-        args: argparse.ArgumentParser) -> Tuple[List[str], List[str]]:
+        args: argparse.ArgumentParser,
+        special_word: str = SPECIAL_WORD) -> List[List[str]]:
     """
     Read an 2 unparallel corpuses: functions and docstrings.
     ---
     Returns:
-        functions: List[str],
-            Tokenized function corpus.
-        comments: List[str],
-            Tokenized docstring corpus.
+        data: List[List[str]]
+            Return summarized data from functions.
     """
     if args.verbose:
         print("Running collect_docstrings")
@@ -159,60 +174,187 @@ def collect_docstrings(
     atok = asttokens.ASTTokens(code, parse=True)
     astree = atok.tree
 
-    functions = []
-    comments = []
+    data = []
 
+    # Global loop: iterating over functions from file
     for fun_ind, fun in enumerate(ast.iter_child_nodes(astree)):
         if isinstance(fun, ast.FunctionDef) and len(fun.body) > 0:
-            a_fun, b_fun = fun.first_token.startpos, fun.last_token.endpos
+            fun_begin = fun.first_token.startpos
+            fun_end = fun.last_token.endpos
             prev_comment = get_previous_comments(fun, code_lines)
             body_start = fun.body[0].first_token.startpos
             docstring = ast.get_docstring(fun)
             if args.verbose:
-                print("Function ind:", fun_ind, "; len(fun.body):", len(fun.body))
+                print("Function ind:", fun_ind)
+                print("len(fun.body):", len(fun.body))
                 print("Docstring:", docstring)
             if not docstring:
                 docstring = ""
             else:
                 docstring = DOCSTRING_PREFIX + docstring + "\n"
+
+            # Forming scope -- set of node ids (variables)
             scope = [arg.arg for arg in fun.args.args]
             for node in ast.walk(fun):
                 if isinstance(node, ast.Name) and \
                    isinstance(node.ctx, ast.Store):
                     scope.append(node.id)
             scope = set(scope)
+
             if len(scope) < 3:
-                print(f"Note: Function with fun.id = {fun.id} has too small scope.")
+                print(f"Note: Function with fun.id = {fun.id} has too small"
+                      "scope.")
             else:
-                first = True
+                is_data_empty = True
                 for node in ast.walk(fun):
-                    if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id in scope:
+                    if isinstance(node, ast.Name) and \
+                        isinstance(node.ctx, ast.Load) and \
+                            node.id in scope:
+
                         # Form current node contents to parse and find comments
                         id_ = node.id
-                        a, b = node.first_token.startpos, node.last_token.endpos
-                        node_code = precomment + code[a_fun:body_start] + docstring + \
-                            code[body_start:a] + special_word + code[b:b_fun] + postcomment
+                        startpos = node.first_token.startpos
+                        endpos = node.last_token.endpos
 
-                        tokens, idx, remember_idxs, comments = get_tokens(node_code, special_word, id_)
-                        assert tokens[idx] == special_word, f"{tokens[idx]} != {special_word}"
-                        assert np.all([tokens[remem_idx]==id_ for remem_idx in remember_idxs])
+                        # Special format for get_token
+                        node_code = prev_comment
+                        node_code += code[fun_begin:body_start]
+                        node_code += docstring
+                        node_code += code[body_start:startpos]
+                        node_code += special_word
+                        node_code += code[endpos:fun_end]
+
+                        tokens, comments, idx, remember_idxs = \
+                            get_tokens(node_code, special_word, id_)
+
+                        # Checker: get_tokens returned proper output
+                        assert tokens[idx] == special_word, \
+                               f"{tokens[idx]} != {special_word}"
+
+                        assert np.all([tokens[remem_idx] == id_
+                                       for remem_idx in remember_idxs])
 
                         node.id = id_
-                        if first:
+                        if is_data_empty:
                             tokens[idx] = id_
-                            data.append([code[a_fun:b_fun], tokens, comments, scope, []])
-                            first = False
-                        data[-1][-1].append([id_, id_, idx, remember_idxs])
-                        buggy_id = list(scope.difference({id_}))\
-                                [np.random.randint(low=0, high=len(scope)-1)]
-                        data[-1][-1].append([id_, buggy_id, idx, remember_idxs])
-            if not first and len(data[-1][-1]) <= 2:
+                            data.append([code[fun_begin:fun_end],
+                                         tokens,
+                                         comments,
+                                         []
+                                         ])
+                            is_data_empty = False
+                        data[-1][-1].append([id_, idx, remember_idxs])
+
+            # Delete rubbish object for this function if necessary
+            if not is_data_empty and len(data[-1][-1]) <= 2:
                 del data[-1]
+        elif args.verbose:
+            print(f"An object with fun_ind={fun_ind} is not a function.")
     return data
 
 
+def retrieve_functions_docstrings(
+        data: List,
+        args: argparse.ArgumentParser) -> List[List[str]]:
+    """
+    add description
+    ---
+    Returns:
+        comments: List[str],
+            Functions comments separately.
+        docstrings: List[str],
+            Tokenized docstring corpus.
+        functions: List[str],
+            Tokenized function corpus.
+        ord_nodes: List[*]
+            Data consists of (node.id, token ind, remember ind)
+            objects for further masking and processing.
+        tokens: List[str],
+            Functions tokens separately.
+    """
+    comments = []
+    docstrings = []
+    functions = []
+    ord_nodes = []
+    tokens = []
+
+    for code, fun_tokens, fun_comments, _, ord_nodes_data in data:
+        # Add asserts for debugging
+        assert type(code) == str, "code variable is not a string"
+        assert type(fun_tokens) == list, \
+            "fun_tokens variable is not a list"
+        assert type(fun_comments) == list, \
+            "fun_comments variable is not a list"
+        assert type(ord_nodes_data) == list, \
+            "ord_nodes_data variable is not a string"
+
+        functions.append(code)
+        tokens.append(fun_tokens)
+        comments.append(fun_comments)
+        ord_nodes.append(ord_nodes_data)
+
+        # Retrieve docstrings by predefined prefix
+        fun_dcstrs = []
+        for fun_cmt in fun_comments:
+            comment_content = fun_cmt[1]
+            docstring_ind = comment_content.find(DOCSTRING_PREFIX)
+            if docstring_ind != -1:
+                # find beginning of comment contents
+                # + 1 is necessary because of space symbol
+                begin = docstring_ind + len(DOCSTRING_PREFIX) + 1
+                fun_dcstrs.append(comment_content[begin:])
+
+        assert len(fun_dcstrs) <= 1, "Two or more docstrings were found."
+
+        docstring = fun_dcstrs[0]
+        docstrings.append(docstring)
+
+    return comments, docstrings, functions, ord_nodes, tokens
+
+
 def main(args):
-    pass
+    if os.path.exists(args.dirname):
+        shutil.rmtree(args.dirname)
+
+    comments_dir = "python150k_comments"
+    docstrings_dir = "python150k_docstrings"
+    functions_dir = "python150k_functions"
+    ord_nodes_dir = "python150k_ord_nodes"
+    tokens_dir = "python150k_tokens"
+
+    for filename in os.listdir(args.dirname):
+        data = collect_data(filename, args)
+        comments, docstrings, functions, ord_nodes, tokens = \
+            retrieve_functions_docstrings(data, args)
+
+        comments_file = open(os.path.join(comments_dir,
+                                          filename), "a")
+        docstrings_file = open(os.path.join(docstrings_dir,
+                                            filename), "a")
+        functions_file = open(os.path.join(functions_dir,
+                                           filename), "a")
+        ord_nodes_file = open(os.path.join(ord_nodes_dir,
+                                           filename), "a")
+        tokens_file = open(os.path.join(tokens_dir,
+                                        filename), "a")
+
+        for comment in comments:
+            comments_file.write(comment)
+        for function in functions:
+            functions_file.write(function)
+        for docstring in docstrings:
+            docstrings_file.write(docstring)
+        for token in tokens:
+            tokens_file.write(token)
+
+        pickle.dump(ord_nodes, ord_nodes_file)
+
+        comments_file.close()
+        docstrings_file.close()
+        functions_file.close()
+        ord_nodes_file.close()
+        tokens_file.close()
+    return
 
 
 if __name__ == '__main__':
