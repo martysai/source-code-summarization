@@ -22,6 +22,8 @@ def set_script_arguments(parser):
     main_args = parser.add_argument_group("Main")
     main_args.add_argument("--dirname", type=str, default="data",
                            help="The directory to be processed.")
+    main_args.add_argument("--outdir", type=str, default="parsed",
+                           help="The directory to write out the output.")
 
     # Runtime arguments
     runtime = parser.add_argument_group("Environment")
@@ -326,38 +328,41 @@ def main(args):
                       functions_dir, tokens_dir]:
         os.mkdir(directory)
 
-    for filename in os.listdir(args.dirname):
-        data = collect_data(filename, args)
-        comments, docstrings, functions, ord_nodes, tokens = \
-            retrieve_functions_docstrings(data, args)
+    for root, _, fnames in sorted(os.walk(args.dirname)):
+        for fname in fnames:
+            if fname.endswith(".py"):
+                filename = os.path.join(args.dirname, fname)
+                data = collect_data(filename, args)
+                comments, docstrings, functions, ord_nodes, tokens = \
+                    retrieve_functions_docstrings(data, args)
 
-        comments_file = open(os.path.join(comments_dir,
-                                          filename), "a")
-        docstrings_file = open(os.path.join(docstrings_dir,
-                                            filename), "a")
-        functions_file = open(os.path.join(functions_dir,
-                                           filename), "a")
-        ord_nodes_file = open(os.path.join(ord_nodes_dir,
-                                           filename), "a")
-        tokens_file = open(os.path.join(tokens_dir,
-                                        filename), "a")
+                comments_file = open(os.path.join(comments_dir,
+                                     filename), "a")
+                docstrings_file = open(os.path.join(docstrings_dir,
+                                       filename), "a")
+                functions_file = open(os.path.join(functions_dir,
+                                      filename), "a")
+                ord_nodes_file = open(os.path.join(ord_nodes_dir,
+                                      filename), "a")
+                tokens_file = open(os.path.join(tokens_dir,
+                                   filename), "a")
 
-        for comment in comments:
-            comments_file.write(comment)
-        for function in functions:
-            functions_file.write(function)
-        for docstring in docstrings:
-            docstrings_file.write(docstring)
-        for token in tokens:
-            tokens_file.write(token)
+                for comment in comments:
+                    comments_file.write(comment)
+                for function in functions:
+                    functions_file.write(function)
+                for docstring in docstrings:
+                    docstrings_file.write(docstring)
+                for token in tokens:
+                    tokens_file.write(token)
 
-        pickle.dump(ord_nodes, ord_nodes_file)
+                pickle.dump(ord_nodes, ord_nodes_file)
 
-        comments_file.close()
-        docstrings_file.close()
-        functions_file.close()
-        ord_nodes_file.close()
-        tokens_file.close()
+                comments_file.close()
+                docstrings_file.close()
+                functions_file.close()
+                ord_nodes_file.close()
+                tokens_file.close()
     return
 
 

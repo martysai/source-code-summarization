@@ -15,3 +15,10 @@ notebooks/.ipynb_checkpoints
 notebooks/__pycache__
 notebooks/new_files
 python150k/process_data_nadya.py
+
+
+# Test data
+python150k/examples/
+python150k/examples/*
+notebooks/0xcite/fingerping/
+notebooks/0xcite/fingerping/*
