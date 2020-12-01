@@ -175,6 +175,7 @@ def collect_data(
     code = read_file_to_string(filename)
     code_lines = code.splitlines()
 
+    print("Building AST tree from a filename:", filename)
     atok = asttokens.ASTTokens(code, parse=True)
     astree = atok.tree
 
@@ -316,11 +317,13 @@ def main(args):
     if os.path.exists(directory):
         shutil.rmtree(directory)
     os.mkdir(directory)
+    print("Created directory:", directory)
 
     sequence_file = open(os.path.join(directory, args.sequence_file), "a")
     comments_file = open(os.path.join(directory, args.comments_file), "a")
     ast_file = open(os.path.join(directory, args.ast_file), "a")
     dcs_file = open(os.path.join(directory, args.docstrings_file), "a")
+    print("Opened output files...")
 
     dcs_cnt, comments_cnt, seq_cnt, ast_cnt = 0, 0, 0, 0
 
@@ -381,4 +384,5 @@ if __name__ == '__main__':
     )
     set_script_arguments(parser)
     args, unknown = parser.parse_known_args()
+    print(args)
     main(args)
