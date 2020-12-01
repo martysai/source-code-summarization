@@ -304,13 +304,15 @@ def set_script_arguments(parser):
                            help="A file to be processed.")
     main_args.add_argument("--docstrings_file", type=str, default="python150k_docstrings.txt",
                            help="A file to be processed.")
+    main_args.add_argument("--output_dir", type=str, default="parsed",
+                           help="Parsing data.")
     return main_args
 
 
 def main(args):
 
     # Clear the output directory
-    directory = "example_output"
+    directory = args.output_dir
     if os.path.exists(directory):
         shutil.rmtree(directory)
     os.mkdir(directory)
