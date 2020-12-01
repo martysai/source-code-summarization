@@ -20,9 +20,12 @@ def read_file_to_string(filename):
     f.close()
     return s
 
-def parse_file(filename):
+def parse_file(filename, input="file"):
     global c, d
-    tree = ast.parse(read_file_to_string(filename), filename)
+    if input == "file":
+        tree = ast.parse(read_file_to_string(filename), filename)
+    else:
+        tree = ast.parse(filename)
     
     json_tree = []
     def gen_identifier(identifier, node_type = 'identifier'):
@@ -56,7 +59,7 @@ def parse_file(filename):
         elif isinstance(node, ast.Num):
             json_node['value'] = unicode(node.n)
         elif isinstance(node, ast.Str):
-            json_node['value'] = node.s#.decode('utf-8')
+            json_node['value'] = "string" #node.s #.decode('utf-8')
         elif isinstance(node, ast.alias):
             json_node['value'] = unicode(node.name)
             if node.asname:
@@ -73,6 +76,8 @@ def parse_file(filename):
                 children.append(gen_identifier(n))
         elif isinstance(node, ast.keyword):
             json_node['value'] = unicode(node.arg)
+        elif isinstance(node, ast.arg):
+            children.append(gen_identifier(node.arg))
         
 
         # Process children.
@@ -88,10 +93,12 @@ def parse_file(filename):
             if node.orelse:
                 children.append(traverse_list(node.orelse, 'orelse'))
         elif isinstance(node, ast.With):
+            children.append(traverse_list(node.items, 'items'))
+            children.append(traverse_list(node.body, 'body'))
+        elif isinstance(node, ast.withitem):
             children.append(traverse(node.context_expr))
             if node.optional_vars:
                 children.append(traverse(node.optional_vars))
-            children.append(traverse_list(node.body, 'body'))
         elif isinstance(node, ast.Try): # Except
             children.append(traverse_list(node.body, 'body'))
             children.append(traverse_list(node.handlers, 'handlers'))
@@ -106,14 +113,14 @@ def parse_file(filename):
             children.append(traverse_list(node.args, 'args'))
             children.append(traverse_list(node.defaults, 'defaults'))
             if node.vararg:
-                children.append(gen_identifier(node.vararg, 'vararg'))
+                children.append(traverse(node.vararg))
             if node.kwarg:
-                children.append(gen_identifier(node.kwarg, 'kwarg'))
+                children.append(traverse(node.kwarg))
         elif isinstance(node, ast.ExceptHandler):
             if node.type:
                 children.append(traverse_list([node.type], 'type'))
             if node.name:
-                children.append(traverse_list([node.name], 'name'))
+                children.append(gen_identifier(node.name, 'name'))
             children.append(traverse_list(node.body, 'body'))
         elif isinstance(node, ast.ClassDef):
             children.append(traverse_list(node.bases, 'bases'))
