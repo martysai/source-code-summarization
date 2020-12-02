@@ -341,7 +341,7 @@ def set_script_arguments(parser):
                            type=str,
                            default="parsed",
                            help="Parsing data.")
-    return main_args
+    return
 
 
 def main(args):
@@ -426,7 +426,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         'Python150k preprocess script',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser = set_script_arguments(parser)
+    set_script_arguments(parser)
     args, unknown = parser.parse_known_args()
     print(args)
     main(args)
