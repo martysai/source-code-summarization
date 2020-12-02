@@ -176,7 +176,7 @@ def collect_data(filename: str,
     global error_counter
 
     # Convert Python 2 to Python 3
-    os.system(f"~/anaconda3/envs/scs/bin/2to3 {filename} -w -n")
+    os.system(f"~/.conda/envs/scs/bin/2to3 {filename} -w -n")
     print("Building AST tree from a filename:", filename)
 
     code = read_file_to_string(filename)
@@ -189,7 +189,7 @@ def collect_data(filename: str,
     try:
         atok = asttokens.ASTTokens(code, parse=True)
         astree = atok.tree
-    except IndentationError:
+    except:
         print("Files with an error:", error_counter)
         error_counter += 1
         is_appropriate = False
