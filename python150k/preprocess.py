@@ -118,16 +118,21 @@ def get_tokens(code: str) -> Tuple[list, int, list]:
     comments = list(processor.comments.values())
 
     stopwords_count = 0
+    is_tokenizable = True
 
-    for idx, token in enumerate(
-            tokenize.tokenize(BytesIO(code.encode('utf-8')).readline)):
-        # Form indices and tokens
-        if token.string not in TOKENS_STOPWORDS:
-            # print(f"idx: {idx}, token: {token.string}")
-            tokens.append(token.string)
-        else:
-            stopwords_count += 1
-    return code, tokens, comments, docstring, stopwords_count
+    try:
+        for idx, token in enumerate(
+                tokenize.tokenize(BytesIO(code.encode('utf-8')).readline)):
+            # Form indices and tokens
+            if token.string not in TOKENS_STOPWORDS:
+                # print(f"idx: {idx}, token: {token.string}")
+                tokens.append(token.string)
+            else:
+                stopwords_count += 1
+    except tokenize.TokenError:
+        is_tokenizable = False
+        return None, None, comments, docstring, stopwords_count, is_tokenizable
+    return code, tokens, comments, docstring, stopwords_count, is_tokenizable
 
 
 def get_previous_comments(fun: ast.FunctionDef, code_lines: List[str]) -> str:
