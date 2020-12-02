@@ -130,7 +130,7 @@ def get_tokens(code: str) -> Tuple[list, int, list]:
                 tokens.append(token.string)
             else:
                 stopwords_count += 1
-    except tokenize.TokenError:
+    except:
         is_tokenizable = False
         return None, None, comments, docstring, stopwords_count, is_tokenizable
     return code, tokens, comments, docstring, stopwords_count, is_tokenizable
@@ -178,7 +178,7 @@ def collect_data(filename: str,
 
     # Convert Python 2 to Python 3
     # os.system(f"~/anaconda3/envs/scs/bin/2to3 {filename} -w -n")
-    run(["/home/masaidov/.conda/envs/scs/bin/2to3", filename, "-w", "-n"],
+    run(["/home/marat/.pyenv/shims/2to3", filename, "-w", "-n"],
         stdout=DEVNULL, stderr=STDOUT)
     print("Building AST tree from a filename:", filename)
 
@@ -330,12 +330,8 @@ def convert_tokens_to_ast(functions):
         try:
             ast_fun_tokens = json.loads(parse_python3.parse_file(function, "code"))
             ast_fun_sequential = get_dfs(convert(ast_fun_tokens))
-        except SyntaxError:
-            print("Met syntax problem.")
-            error_counter += 1
-            continue
-        except TypeError:
-            print("JSON is not serializable.")
+        except:
+            print("Met syntax or type error.")
             error_counter += 1
             continue
         ast_tokens.append(ast_fun_sequential)
