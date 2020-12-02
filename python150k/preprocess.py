@@ -182,7 +182,13 @@ def collect_data(filename: str,
         stdout=DEVNULL, stderr=STDOUT)
     print("Building AST tree from a filename:", filename)
 
-    code = read_file_to_string(filename)
+    try:
+        code = read_file_to_string(filename)
+    except:
+        print("File with bad encoding:", filename)
+        error_counter += 1
+        is_appropriate = False
+        return None, is_appropriate
 
     # let's replace tabs for spaces in the future
     code = re.sub('\t', ' ' * 4, code)
