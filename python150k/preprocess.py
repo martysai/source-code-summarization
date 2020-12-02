@@ -223,8 +223,6 @@ def collect_data(filename: str,
             # should relax tabulation
             start_def = function_code.find("def")
             function_code = function_code[start_def:]
-            # if start_def > 0:
-
 
             function_code, tokens, comments, docstring, stopwords_count = \
                 get_tokens(function_code)
@@ -426,9 +424,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        'Python150k process 1 file',
+        'Python150k preprocess script',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    set_script_arguments(parser)
+    parser = set_script_arguments(parser)
     args, unknown = parser.parse_known_args()
     print(args)
     main(args)
