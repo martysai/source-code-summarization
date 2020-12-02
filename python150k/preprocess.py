@@ -178,7 +178,7 @@ def collect_data(filename: str,
 
     # Convert Python 2 to Python 3
     # os.system(f"~/anaconda3/envs/scs/bin/2to3 {filename} -w -n")
-    run(["/home/marat/.pyenv/shims/2to3", filename, "-w", "-n"],
+    run(["/home/masaidov/.conda/envs/scs/bin/2to3", filename, "-w", "-n"],
         stdout=DEVNULL, stderr=STDOUT)
     print("Building AST tree from a filename:", filename)
 
