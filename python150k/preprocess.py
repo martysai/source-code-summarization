@@ -107,7 +107,6 @@ def get_tokens(
     docstring = None
     if ds_begin != -1 and ds_end != -1:
         docstring = code[ds_begin + 3: ds_end].strip()
-        docstring += " ."
 
     # Erase docstring from the code
     if ds_begin != -1 and ds_end != -1:
@@ -159,6 +158,9 @@ def get_previous_comments(
     return precomment
 
 
+error_counter = 0
+
+
 def collect_data(
         filename: str,
         args: argparse.ArgumentParser) -> List[List[str]]:
@@ -170,14 +172,29 @@ def collect_data(
             Summarized data from functions.
         is_appropriate: bool
             A flag indicating that the file is appropriate
-            (enough scope size).
+            (enough scope size or no errors in parsing).
     """
+    global error_counter
+
+    # Convert Python 2 to Python 3
+    os.system(f"~/anaconda3/envs/scs/bin/2to3 {filename} -w -n")
+    print("Building AST tree from a filename:", filename)
+
     code = read_file_to_string(filename)
+
+    # let's replace tabs for spaces in the future
+    code = re.sub('\t', ' ' * 4, code)
+
     code_lines = code.splitlines()
 
-    print("Building AST tree from a filename:", filename)
-    atok = asttokens.ASTTokens(code, parse=True)
-    astree = atok.tree
+    try:
+        atok = asttokens.ASTTokens(code, parse=True)
+        astree = atok.tree
+    except IndentationError:
+        print("Files with an error:", error_counter)
+        error_counter += 1
+        is_appropriate = False
+        return None, is_appropriate
 
     data = []
 
@@ -207,6 +224,13 @@ def collect_data(
                 continue
 
             function_code = code[fun_begin:fun_end]
+
+            # if met @classmethod keyword,
+            # should relax tabulation
+            start_def = function_code.find("def")
+            function_code = function_code[start_def:]
+            # if start_def > 0:
+
 
             function_code, tokens, comments, docstring, stopwords_count = \
                 get_tokens(function_code)
@@ -247,6 +271,7 @@ def retrieve_functions_docstrings(
 
     preprocess_code = Preprocess("code")
     preprocess_comment = Preprocess("anno")
+    preprocess_docstring = Preprocess("docs")
 
     comments = []
     docstrings = []
@@ -278,7 +303,11 @@ def retrieve_functions_docstrings(
 
         functions.append(code)
         tokens.append(fun_tokens_string)
-        docstrings.append(docstring)
+
+        if docstring is not None:
+            docstring = preprocess_docstring.clean(docstring).strip()
+            if len(docstring) > 0:
+                docstrings.append(docstring)
 
     return comments, docstrings, functions, ord_nodes, tokens
 
@@ -311,6 +340,11 @@ def set_script_arguments(parser):
 
 
 def main(args):
+    global error_counter
+    # Clear the convertation directory
+    if os.path.exists("converted"):
+        shutil.rmtree("converted")
+    os.mkdir("converted")
 
     # Clear the output directory
     directory = args.output_dir
@@ -325,7 +359,7 @@ def main(args):
     dcs_file = open(os.path.join(directory, args.docstrings_file), "a")
     print("Opened output files...")
 
-    dcs_cnt, comments_cnt, seq_cnt, ast_cnt = 0, 0, 0, 0
+    dcs_cnt, comments_cnt, seq_cnt, ast_cnt, file_cnt = 0, 0, 0, 0, 0
 
     for root, _, fnames in sorted(os.walk(args.dirname)):
         # print("ROOT:", root)
@@ -336,6 +370,8 @@ def main(args):
                 filename = os.path.join(root, fname)
 
                 data, is_appropriate = collect_data(filename, args)
+                if not is_appropriate:
+                    continue
                 comments, docstrings, functions, ord_nodes, tokens = \
                     retrieve_functions_docstrings(data, args)
 
@@ -364,10 +400,13 @@ def main(args):
                     ast_file.write(f"{ast_string}\n")
                     ast_cnt += 1
 
+                file_cnt += 1
                 print("Updated docstrings count:", dcs_cnt)
                 print("Updated comment count:", comments_cnt)
                 print("Updated sequential count:", seq_cnt)
                 print("Updated AST count:", ast_cnt)
+                print("Processed/Canceled/Total files:",
+                      f"{file_cnt}/{error_counter}/{file_cnt + error_counter}")
                 print("~" * 50)
 
     sequence_file.close()
