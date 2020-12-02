@@ -23,13 +23,13 @@ class Preprocess:
         x = re.sub(r'[?，`“”’™•°]', '', x)
 
         if self.mode == 'anno' or self.mode == 'docs':
-            x = re.sub(r'[,:;]', '', x)
+            x = re.sub(r'[,:;]', r'', x)
             x = re.sub(r'([\+\-\*/=(){}%^&\.])', r' \1 ', x)
             x = re.sub(r'\.+$', r'', x)
 
         if self.mode == 'docs':
-            x = re.sub(r'[\t\r\n\v\f]', '', x)
-            x = re.sub(r'[\(\[\]\)]', x)
+            x = re.sub(r'[\t\r\n\v\f]', r'', x)
+            x = re.sub(r'[\(\[\]\)]', r'', x)
 
         if self.mode == 'code':
             x = re.sub(r'[\(\[\+\-\*/,:;=(){}%^&\]\)\'\"]', r'', x).strip()
