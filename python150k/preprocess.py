@@ -8,6 +8,7 @@ import tokenize
 from ast_conversion import get_dfs, convert
 from io import BytesIO
 from processor_ast import Preprocess
+from subprocess import DEVNULL, STDOUT, run
 from typing import Tuple, List
 
 import json
@@ -176,7 +177,9 @@ def collect_data(filename: str,
     global error_counter
 
     # Convert Python 2 to Python 3
-    os.system(f"~/.conda/envs/scs/bin/2to3 {filename} -w -n")
+    # os.system(f"~/anaconda3/envs/scs/bin/2to3 {filename} -w -n")
+    run(["/home/masaidov/.conda/envs/scs/bin/2to3", filename, "-w", "-n"],
+        stdout=DEVNULL, stderr=STDOUT)
     print("Building AST tree from a filename:", filename)
 
     code = read_file_to_string(filename)
