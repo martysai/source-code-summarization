@@ -18,7 +18,9 @@ def convert(ast):
             new_dp.append({"value": node["value"]})
         else:
             if "children" in node:
-                node["children"] = [n + increase_by[n] for n in node["children"]]
+                node["children"] = [
+                    n + increase_by[n] for n in node["children"]
+                ]
             new_dp.append(node)
 
     # sanity check
@@ -37,5 +39,5 @@ def get_dfs(ast, only_leaf=False):
             dp.append(str(node["value"]))
         else:
             if not only_leaf:
-                dp.append("<"+node["type"]+">")
+                dp.append("<" + node["type"] + ">")
     return dp

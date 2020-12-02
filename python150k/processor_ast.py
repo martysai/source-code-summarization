@@ -10,11 +10,10 @@ class Preprocess:
         self.mode = mode
 
     def tokenize_python(self, snippet: str):
-        toks = py_tokenize.tokenize(BytesIO(snippet.strip().encode('utf-8')).readline)
-        predicate = lambda t: py_token.tok_name[t.type] not in ['ENCODING',
-                                                                'NEWLINE',
-                                                                'ENDMARKER',
-                                                                'ERRORTOKEN']
+        toks = py_tokenize.tokenize(
+            BytesIO(snippet.strip().encode('utf-8')).readline)
+        predicate = lambda t: py_token.tok_name[
+            t.type] not in ['ENCODING', 'NEWLINE', 'ENDMARKER', 'ERRORTOKEN']
         return [t.string for t in toks if predicate(t)]
         return [t.string for t in toks]
 

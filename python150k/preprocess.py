@@ -17,7 +17,6 @@ import parse_python3
 import string
 EXCLUDE_TOKENS = set(string.punctuation)
 
-
 SPACE_STOPWORDS = [' ', '\t', '\r', '\n', '\v', '\f']
 TOKENS_STOPWORDS = SPACE_STOPWORDS + ["utf-8"]
 DOCSTRING_PREFIX = "###DCSTR### "
@@ -74,9 +73,7 @@ def read_file_to_string(filename: str) -> str:
     return s
 
 
-def get_tokens(
-        code: str
-        ) -> Tuple[list, int, list]:
+def get_tokens(code: str) -> Tuple[list, int, list]:
     """
     code: str,
         Represents Python's file in string.
@@ -106,7 +103,7 @@ def get_tokens(
 
     docstring = None
     if ds_begin != -1 and ds_end != -1:
-        docstring = code[ds_begin + 3: ds_end].strip()
+        docstring = code[ds_begin + 3:ds_end].strip()
 
     # Erase docstring from the code
     if ds_begin != -1 and ds_end != -1:
@@ -122,8 +119,8 @@ def get_tokens(
 
     stopwords_count = 0
 
-    for idx, token in enumerate(tokenize.tokenize(
-                      BytesIO(code.encode('utf-8')).readline)):
+    for idx, token in enumerate(
+            tokenize.tokenize(BytesIO(code.encode('utf-8')).readline)):
         # Form indices and tokens
         if token.string not in TOKENS_STOPWORDS:
             # print(f"idx: {idx}, token: {token.string}")
@@ -133,9 +130,7 @@ def get_tokens(
     return code, tokens, comments, docstring, stopwords_count
 
 
-def get_previous_comments(
-        fun: ast.FunctionDef,
-        code_lines: List[str]) -> str:
+def get_previous_comments(fun: ast.FunctionDef, code_lines: List[str]) -> str:
     """
     Returns a comment on the line above the function definition.
     ---
@@ -151,9 +146,9 @@ def get_previous_comments(
 
     precomment = ""
     if (len(comment_line) > 0) and (comment_line[0] == "#"):
-        if (fun_line_first >= 2 and len(comment_line) >= 1 and
-                zero_line == "") or (fun_line_first == 1 and
-                                     len(comment_line) >= 1):
+        if (fun_line_first >= 2 and len(comment_line) >= 1
+                and zero_line == "") or (fun_line_first == 1
+                                         and len(comment_line) >= 1):
             precomment = code_lines[fun_line_first - 1].strip()
     return precomment
 
@@ -161,9 +156,8 @@ def get_previous_comments(
 error_counter = 0
 
 
-def collect_data(
-        filename: str,
-        args: argparse.ArgumentParser) -> List[List[str]]:
+def collect_data(filename: str,
+                 args: argparse.ArgumentParser) -> List[List[str]]:
     """
     Read an 2 unparallel corpuses: functions and docstrings.
     ---
@@ -248,8 +242,7 @@ def collect_data(
 
 
 def retrieve_functions_docstrings(
-        data: List,
-        args: argparse.ArgumentParser) -> List[List[str]]:
+        data: List, args: argparse.ArgumentParser) -> List[List[str]]:
     """
     add description
     ---
@@ -291,7 +284,9 @@ def retrieve_functions_docstrings(
         for comment in fun_comments:
             if len(comment) <= 3:
                 continue
-            comment = preprocess_comment.clean(comment).replace("'", " ").replace('"', " ")
+            comment = preprocess_comment.clean(comment).replace("'",
+                                                                " ").replace(
+                                                                    '"', " ")
             comment = comment[:comment.find(".")]
             comment = ''.join(ch for ch in comment if ch not in EXCLUDE_TOKENS)
             comment = ' '.join(comment.split()) + " ."
@@ -324,17 +319,29 @@ def convert_tokens_to_ast(functions):
 def set_script_arguments(parser):
     # Main arguments
     main_args = parser.add_argument_group("Main")
-    main_args.add_argument("--dirname", type=str, default="examples",
+    main_args.add_argument("--dirname",
+                           type=str,
+                           default="examples",
                            help="A file to be processed.")
-    main_args.add_argument("--sequence_file", type=str, default="python150k_sequence.txt",
+    main_args.add_argument("--sequence_file",
+                           type=str,
+                           default="python150k_sequence.txt",
                            help="A file to be processed.")
-    main_args.add_argument("--ast_file", type=str, default="python150k_ast.txt",
+    main_args.add_argument("--ast_file",
+                           type=str,
+                           default="python150k_ast.txt",
                            help="A file to be processed.")
-    main_args.add_argument("--comments_file", type=str, default="python150k_comments.txt",
+    main_args.add_argument("--comments_file",
+                           type=str,
+                           default="python150k_comments.txt",
                            help="A file to be processed.")
-    main_args.add_argument("--docstrings_file", type=str, default="python150k_docstrings.txt",
+    main_args.add_argument("--docstrings_file",
+                           type=str,
+                           default="python150k_docstrings.txt",
                            help="A file to be processed.")
-    main_args.add_argument("--output_dir", type=str, default="parsed",
+    main_args.add_argument("--output_dir",
+                           type=str,
+                           default="parsed",
                            help="Parsing data.")
     return main_args
 
@@ -405,8 +412,9 @@ def main(args):
                 print("Updated comment count:", comments_cnt)
                 print("Updated sequential count:", seq_cnt)
                 print("Updated AST count:", ast_cnt)
-                print("Processed/Canceled/Total files:",
-                      f"{file_cnt}/{error_counter}/{file_cnt + error_counter}")
+                print(
+                    "Processed/Canceled/Total files:",
+                    f"{file_cnt}/{error_counter}/{file_cnt + error_counter}")
                 print("~" * 50)
 
     sequence_file.close()
@@ -419,8 +427,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         'Python150k process 1 file',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     set_script_arguments(parser)
     args, unknown = parser.parse_known_args()
     print(args)

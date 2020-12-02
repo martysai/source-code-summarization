@@ -6,6 +6,7 @@ import ast
 
 unicode = lambda s: s
 
+
 def PrintUsage():
     sys.stderr.write("""
 Usage:
@@ -14,11 +15,13 @@ Usage:
 """)
     exit(1)
 
+
 def read_file_to_string(filename):
     f = open(filename, 'rt')
     s = f.read()
     f.close()
     return s
+
 
 def parse_file(filename, input="file"):
     global c, d
@@ -26,17 +29,18 @@ def parse_file(filename, input="file"):
         tree = ast.parse(read_file_to_string(filename), filename)
     else:
         tree = ast.parse(filename)
-    
+
     json_tree = []
-    def gen_identifier(identifier, node_type = 'identifier'):
+
+    def gen_identifier(identifier, node_type='identifier'):
         pos = len(json_tree)
         json_node = {}
         json_tree.append(json_node)
         json_node['type'] = node_type
         json_node['value'] = identifier
         return pos
-    
-    def traverse_list(l, node_type = 'list'):
+
+    def traverse_list(l, node_type='list'):
         pos = len(json_tree)
         json_node = {}
         json_tree.append(json_node)
@@ -47,7 +51,7 @@ def parse_file(filename, input="file"):
         if (len(children) != 0):
             json_node['children'] = children
         return pos
-        
+
     def traverse(node):
         pos = len(json_tree)
         json_node = {}
@@ -59,7 +63,7 @@ def parse_file(filename, input="file"):
         elif isinstance(node, ast.Num):
             json_node['value'] = unicode(node.n)
         elif isinstance(node, ast.Str):
-            json_node['value'] = "string" #node.s #.decode('utf-8')
+            json_node['value'] = "string"  #node.s #.decode('utf-8')
         elif isinstance(node, ast.alias):
             json_node['value'] = unicode(node.name)
             if node.asname:
@@ -70,7 +74,7 @@ def parse_file(filename, input="file"):
             json_node['value'] = unicode(node.name)
         elif isinstance(node, ast.ImportFrom):
             if node.module:
-                json_node['value'] = unicode(node.module) 
+                json_node['value'] = unicode(node.module)
         elif isinstance(node, ast.Global):
             for n in node.names:
                 children.append(gen_identifier(n))
@@ -78,7 +82,6 @@ def parse_file(filename, input="file"):
             json_node['value'] = unicode(node.arg)
         elif isinstance(node, ast.arg):
             children.append(gen_identifier(node.arg))
-        
 
         # Process children.
         if isinstance(node, ast.For):
@@ -99,7 +102,7 @@ def parse_file(filename, input="file"):
             children.append(traverse(node.context_expr))
             if node.optional_vars:
                 children.append(traverse(node.optional_vars))
-        elif isinstance(node, ast.Try): # Except
+        elif isinstance(node, ast.Try):  # Except
             children.append(traverse_list(node.body, 'body'))
             children.append(traverse_list(node.handlers, 'handlers'))
             if node.orelse:
@@ -125,29 +128,37 @@ def parse_file(filename, input="file"):
         elif isinstance(node, ast.ClassDef):
             children.append(traverse_list(node.bases, 'bases'))
             children.append(traverse_list(node.body, 'body'))
-            children.append(traverse_list(node.decorator_list, 'decorator_list'))
+            children.append(
+                traverse_list(node.decorator_list, 'decorator_list'))
         elif isinstance(node, ast.FunctionDef):
             children.append(traverse(node.args))
             children.append(traverse_list(node.body, 'body'))
-            children.append(traverse_list(node.decorator_list, 'decorator_list'))
+            children.append(
+                traverse_list(node.decorator_list, 'decorator_list'))
         else:
             # Default handling: iterate over children.
             for child in ast.iter_child_nodes(node):
-                if isinstance(child, ast.expr_context) or isinstance(child, ast.operator) or isinstance(child, ast.boolop) or isinstance(child, ast.unaryop) or isinstance(child, ast.cmpop):
+                if isinstance(child, ast.expr_context) or isinstance(
+                        child, ast.operator) or isinstance(
+                            child, ast.boolop) or isinstance(
+                                child, ast.unaryop) or isinstance(
+                                    child, ast.cmpop):
                     # Directly include expr_context, and operators into the type instead of creating a child.
-                    json_node['type'] = json_node['type'] + type(child).__name__
+                    json_node['type'] = json_node['type'] + type(
+                        child).__name__
                 else:
                     children.append(traverse(child))
-                
+
         if isinstance(node, ast.Attribute):
             children.append(gen_identifier(node.attr, 'attr'))
-                
+
         if (len(children) != 0):
             json_node['children'] = children
         return pos
-    
+
     traverse(tree)
     return json.dumps(json_tree, separators=(',', ':'), ensure_ascii=False)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
