@@ -9,3 +9,18 @@ We provide source file used to obtain the py150 dataset (https://www.sri.inf.eth
 Note that the order of python100k_train.txt and python100k_train.json (containing the ASTs of the parsed files) are the same.
 That is, parsing the n-th file from python100k_train.txt produces n-th ASTs in python100k_train.json
 
+# How to use?
+
+Run:
+```
+python preprocess.py --dirname <folder with python150k>
+```
+
+Then functions are stored in:
+```
+| parsed
+--> python150k_sequence.txt
+--> python150k_docstrings.txt
+--> python150k_ast.txt
+--> python150k_comments.txt
+```
