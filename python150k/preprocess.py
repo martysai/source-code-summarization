@@ -229,8 +229,13 @@ def collect_data(filename: str,
             start_def = function_code.find("def")
             function_code = function_code[start_def:]
 
-            function_code, tokens, comments, docstring, stopwords_count = \
-                get_tokens(function_code)
+            function_code, tokens, comments, docstring, stopwords_count, \
+                is_tokenizable = get_tokens(function_code)
+
+            if not is_tokenizable:
+                error_counter += 1
+                function_code = ""
+                tokens = []
 
             # print(f"In filename = {filename}, fun_ind = {fun_ind}")
             # print(f"Found {stopwords_count} stopwords.")
@@ -313,6 +318,10 @@ def retrieve_functions_docstrings(
 def convert_tokens_to_ast(functions):
     ast_tokens = []
     for function in functions:
+        if len(function) == 0:
+            # Happens after returned TokenError
+            # Empty function should be skipped
+            continue
         ast_fun_tokens = json.loads(parse_python3.parse_file(function, "code"))
         ast_fun_sequential = get_dfs(convert(ast_fun_tokens))
         ast_tokens.append(ast_fun_sequential)
