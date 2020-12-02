@@ -316,14 +316,20 @@ def retrieve_functions_docstrings(
 
 
 def convert_tokens_to_ast(functions):
+    global error_counter
     ast_tokens = []
     for function in functions:
         if len(function) == 0:
             # Happens after returned TokenError
             # Empty function should be skipped
             continue
-        ast_fun_tokens = json.loads(parse_python3.parse_file(function, "code"))
-        ast_fun_sequential = get_dfs(convert(ast_fun_tokens))
+        # One more option to get an error
+        try:
+            ast_fun_tokens = json.loads(parse_python3.parse_file(function, "code"))
+            ast_fun_sequential = get_dfs(convert(ast_fun_tokens))
+        except SyntaxError:
+            error_counter += 1
+            continue
         ast_tokens.append(ast_fun_sequential)
     return ast_tokens
 
