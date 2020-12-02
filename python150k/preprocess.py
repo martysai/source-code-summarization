@@ -328,6 +328,11 @@ def convert_tokens_to_ast(functions):
             ast_fun_tokens = json.loads(parse_python3.parse_file(function, "code"))
             ast_fun_sequential = get_dfs(convert(ast_fun_tokens))
         except SyntaxError:
+            print("Met syntax problem.")
+            error_counter += 1
+            continue
+        except TypeError:
+            print("JSON is not serializable.")
             error_counter += 1
             continue
         ast_tokens.append(ast_fun_sequential)
