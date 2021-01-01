@@ -22,5 +22,4 @@ python150k/examples/
 python150k/examples/*
 notebooks/0xcite/fingerping/
 notebooks/0xcite/fingerping/*
-notebooks/EDA-Python150k.ipynb
 notebooks/varmisuse_example.ipynb
