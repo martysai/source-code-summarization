@@ -1,25 +1,31 @@
-python150k/*tar*
-python150k/*txt
-python150k/data/
-python150k/data/*
-.vscode
-.vscode/*
-transcoder/model_cpp_python.pth
-python150k/sc*
-tree_transformer_info/*
-raw_code_data/*
-code_data_fairseq/*
-tree_transformer/__pycache__
-train_tree_transformer/*
-notebooks/.ipynb_checkpoints
-notebooks/__pycache__
-notebooks/new_files
-python150k/process_data_nadya.py
+# Data artifacts
+data/processed/
+data/expanded/
+data/raw/python-method/train/
+data/raw/python-method/dev/
+data/raw/python-method/test/
+data/raw/python-method/*.zip
 
+# Training outputs
+outputs/
+wandb/
+*.pt
+*.bin
+*.safetensors
 
-# Test data
-python150k/examples/
-python150k/examples/*
-notebooks/0xcite/fingerping/
-notebooks/0xcite/fingerping/*
-notebooks/varmisuse_example.ipynb
+# Python
+__pycache__/
+*.egg-info/
+dist/
+build/
+.ruff_cache/
+.venv/
+
+# IDE
+.vscode/
+
+# Jupyter
+notebooks/.ipynb_checkpoints/
+
+# Environment
+.env

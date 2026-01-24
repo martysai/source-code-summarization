@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "source-code-summarization"
+version = "0.1.0"
+description = "LLM-based code summarization with AST-aware evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "transformers>=4.36.0",
+    "datasets>=2.16.0",
+    "peft>=0.7.0",
+    "accelerate>=0.25.0",
+    "bitsandbytes>=0.41.0",
+    "trl>=0.7.0",
+    "distilabel>=1.0.0",
+    "tree-sitter>=0.20.0",
+    "tree-sitter-python>=0.20.0",
+    "evaluate>=0.4.0",
+    "rouge-score",
+    "nltk",
+    "safetensors",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
