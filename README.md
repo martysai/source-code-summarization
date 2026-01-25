@@ -81,10 +81,7 @@ Migrated from the original Python150k preprocessing pipeline:
 # Install dependencies
 pip install -e ".[dev]"
 
-# Download the seed dataset
-cd data/raw/python-method && bash get_data.sh && cd -
-
-# Convert to HuggingFace format
+# Convert to HuggingFace format (requires dataset access, see below)
 python -m src.data.convert_seed \
     --input-dir data/raw/python-method \
     --output-dir data/processed/python-method
@@ -94,6 +91,17 @@ python -m src.data.convert_seed \
 
 The seed dataset comes from the [NeuralCodeSum](https://github.com/wasiahmad/NeuralCodeSum)
 project (ACL 2020): 92,545 Python function-docstring pairs split into train/dev/test.
+
+### Dataset Access
+
+The python-method dataset was previously available via a Google Drive download script
+(`data/raw/python-method/get_data.sh`). This script has been removed as the Google Drive
+link (file ID: `1XPE1txk9VI0aOT_TdqbAeI58Q8puKVl2`) is no longer accessible.
+
+To obtain the dataset, you can:
+1. Contact the [NeuralCodeSum](https://github.com/wasiahmad/NeuralCodeSum) authors
+2. Download from the original source if available at the project repository
+3. Use the alternative python150k dataset from [ETH Zurich SRI Lab](https://www.sri.inf.ethz.ch/py150)
 
 ## Acknowledgments
 
