@@ -2,87 +2,19 @@ import argparse
 import requests
 import sys
 import json
+import time
+from pathlib import Path
 
 
-SYSTEM_PROMPT = r"""
-You are a Python documentation expert. Your task is to generate a docstring for the provided Python function following the NumPy documentation format strictly.
-
-\#\# Output Rules
-- Output ONLY the docstring content (including the triple quotes)
-- Do NOT include the function signature or body
-- Do NOT add any explanation before or after the docstring
-
-\#\# NumPy Docstring Format
-
-\#\#\# Structure (include sections only when applicable)
-\"\"\"
-Short one-line summary (imperative mood, e.g., "Compute", "Return", "Parse").
-
-Extended summary providing more details about the function behavior,
-algorithm, or implementation notes. Optional but recommended for
-complex functions.
-
-Parameters
-----------
-param_name : type
-    Description of the parameter. If the description spans multiple
-    lines, indent continuation lines.
-param_name : type, optional
-    For optional parameters, specify default value in description.
-    Default is `default_value`.
-*args : type
-    Description of variable positional arguments.
-**kwargs : type
-    Description of variable keyword arguments.
-
-Returns
--------
-type
-    Description of return value.
-name : type
-    Use this format when returning named values or multiple values.
-
-Yields
-------
-type
-    For generator functions, describe yielded values.
-
-Raises
-------
-ExceptionType
-    Explanation of when this exception is raised.
-
-See Also
---------
-related_function : Brief description of relation.
-
-Notes
------
-Additional technical notes, mathematical formulas (using LaTeX),
-or implementation details.
-
-Examples
---------
->>> function_name(arg1, arg2)
-expected_output
-\"\"\"
-
-\#\#\# Type Annotation Conventions
-- Basic types: `int`, `float`, `str`, `bool`, `None`
-- Collections: `list of int`, `dict of {str: int}`, `tuple of (int, str)`
-- Multiple types: `int or float`, `str or None`
-- Array-like: `array_like`, `numpy.ndarray of shape (n, m)`
-- Callable: `callable`
-- Optional params: append `, optional` after type
-
-\#\#\# Guidelines
-1. First line: concise, imperative verb, no variable names, ends with period
-2. Leave one blank line after the summary before Parameters
-3. Align parameter descriptions consistently
-4. Include realistic, runnable Examples when behavior isn't obvious
-5. Document all exceptions that may be explicitly raised
-6. For boolean params, describe what True/False means
-"""
+def load_system_prompt() -> str:
+    """Load the default system prompt from the prompts directory."""
+    prompt_path = Path(__file__).parent.parent / "src" / "training" / "prompts" / "system_prompt.md"
+    if not prompt_path.exists():
+        raise FileNotFoundError(
+            f"System prompt file not found: {prompt_path}. "
+            "Please ensure the prompt file exists."
+        )
+    return prompt_path.read_text(encoding="utf-8")
 
 
 DEFAULT_URL = "http://localhost:11434/api/chat"  # Changed from /api/generate
@@ -115,7 +47,14 @@ def main():
     args = parser.parse_args()
 
     # Use default system prompt if none provided
-    system_msgs = args.system if args.system else [SYSTEM_PROMPT]
+    if args.system:
+        system_msgs = args.system
+    else:
+        try:
+            system_msgs = [load_system_prompt()]
+        except FileNotFoundError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
 
     if not args.user:
         print("Error: at least one --user prompt is required.", file=sys.stderr)
@@ -123,11 +62,15 @@ def main():
 
     payload = build_payload(args.model, system_msgs, args.user, args.stream)
 
+    # Track execution time
+    start_time = time.time()
     try:
         resp = requests.post(args.url, json=payload, timeout=args.timeout)
         resp.raise_for_status()
     except requests.RequestException as e:
+        elapsed_time = time.time() - start_time
         print(f"Request failed: {e}", file=sys.stderr)
+        print(f"Execution time: {elapsed_time:.2f}s", file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -147,6 +90,10 @@ def main():
             print(c.get("message", {}).get("content", c.get("text", "")))
     else:
         print(json.dumps(data, indent=2))
+
+    # Print execution time
+    elapsed_time = time.time() - start_time
+    print(f"Execution time: {elapsed_time:.2f}s", file=sys.stdout)
 
 
 if __name__ == "__main__":

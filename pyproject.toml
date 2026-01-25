@@ -24,12 +24,14 @@ dependencies = [
     "safetensors",
     "fastapi>=0.104.0",
     "uvicorn>=0.24.0",
+    "requests>=2.31.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
     "ruff>=0.1.0",
+    "httpx>=0.24.0",
 ]
 
 [tool.hatch.build.targets.wheel]

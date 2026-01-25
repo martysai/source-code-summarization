@@ -23,6 +23,7 @@ build/
 
 # IDE
 .vscode/
+.pytest_cache/
 
 # Jupyter
 notebooks/.ipynb_checkpoints/
