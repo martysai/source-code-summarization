@@ -6,7 +6,8 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from src.training.serve import app, check_ollama_health, generate_docstring
+from src.training.serve import app, check_ollama_health, generate_docstring, get_active_model
+from src.training.models import MODEL_REGISTRY, DEFAULT_MODEL_KEY, get_model_config
 
 
 @pytest.fixture
@@ -32,6 +33,9 @@ class TestHealthEndpoint:
         data = response.json()
         assert data["status"] == "healthy"
         assert data["service"] == "ollama"
+        # New fields for model info
+        assert "active_model" in data
+        assert "ollama_model" in data
         mock_get.assert_called_once()
 
     @patch("src.training.serve.requests.get")
@@ -99,6 +103,8 @@ class TestGenerateEndpoint:
         data = response.json()
         assert "docstring" in data
         assert "Compute the sum" in data["docstring"]
+        # New field for model info
+        assert "model" in data
         mock_post.assert_called_once()
 
     @patch("src.training.serve.requests.post")
@@ -310,3 +316,187 @@ class TestHelperFunctions:
             generate_docstring("def test(): pass")
 
         assert "Failed to generate docstring" in str(exc_info.value)
+
+
+class TestModelsEndpoint:
+    """Tests for the /models endpoint."""
+
+    def test_list_models_returns_all(self, client):
+        """GET /models should return all registered models."""
+        response = client.get("/models")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "models" in data
+        assert len(data["models"]) == len(MODEL_REGISTRY)
+
+    def test_list_models_includes_default(self, client):
+        """Response should indicate the default model."""
+        response = client.get("/models")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "default" in data
+        assert data["default"] == DEFAULT_MODEL_KEY
+
+    def test_list_models_includes_active(self, client):
+        """Response should indicate the active model."""
+        response = client.get("/models")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "active" in data
+
+    def test_list_models_model_structure(self, client):
+        """Each model in the list should have required fields."""
+        response = client.get("/models")
+
+        assert response.status_code == 200
+        data = response.json()
+        for model in data["models"]:
+            assert "key" in model
+            assert "name" in model
+            assert "ollama_model" in model
+            assert "context_window" in model
+            assert "architecture" in model
+
+
+class TestModelSelection:
+    """Tests for per-request model selection."""
+
+    @patch("src.training.serve.requests.post")
+    def test_generate_with_specific_model_key(self, mock_post, client):
+        """Should use the specified model key in the request."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "message": {"content": '"""Test docstring."""'}
+        }
+        mock_post.return_value = mock_response
+
+        request_data = {
+            "code": "def test(): pass",
+            "model": "qwen2.5-coder-7b"
+        }
+        response = client.post("/generate", json=request_data)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["model"] == "qwen2.5-coder:7b"
+
+        # Verify the correct model was used in the payload
+        call_args = mock_post.call_args
+        payload = call_args[1]["json"]
+        assert payload["model"] == "qwen2.5-coder:7b"
+
+    @patch("src.training.serve.requests.post")
+    def test_generate_with_raw_ollama_model(self, mock_post, client):
+        """Should accept raw Ollama model names."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "message": {"content": '"""Test docstring."""'}
+        }
+        mock_post.return_value = mock_response
+
+        request_data = {
+            "code": "def test(): pass",
+            "model": "qwen2.5-coder:14b"
+        }
+        response = client.post("/generate", json=request_data)
+
+        assert response.status_code == 200
+
+    @patch("src.training.serve.requests.post")
+    def test_generate_applies_model_sampling(self, mock_post, client):
+        """Should apply model-specific sampling parameters."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "message": {"content": '"""Test docstring."""'}
+        }
+        mock_post.return_value = mock_response
+
+        # Use Qwen3 which has different sampling params
+        request_data = {
+            "code": "def test(): pass",
+            "model": "qwen3-coder-30b"
+        }
+        response = client.post("/generate", json=request_data)
+
+        assert response.status_code == 200
+
+        # Verify Qwen3 sampling parameters were used
+        call_args = mock_post.call_args
+        payload = call_args[1]["json"]
+        options = payload["options"]
+        assert options["temperature"] == 1.0
+        assert options["top_p"] == 0.95
+        assert options["top_k"] == 40
+
+    @patch("src.training.serve.requests.post")
+    def test_generate_applies_model_keep_alive(self, mock_post, client):
+        """Should apply model-specific keep_alive setting."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "message": {"content": '"""Test docstring."""'}
+        }
+        mock_post.return_value = mock_response
+
+        # Use Qwen3 which has keep_alive=300
+        request_data = {
+            "code": "def test(): pass",
+            "model": "qwen3-coder-30b"
+        }
+        response = client.post("/generate", json=request_data)
+
+        assert response.status_code == 200
+
+        # Verify Qwen3 keep_alive was used
+        call_args = mock_post.call_args
+        payload = call_args[1]["json"]
+        assert payload["keep_alive"] == 300
+
+    @patch("src.training.serve.requests.post")
+    def test_generate_without_model_uses_default(self, mock_post, client):
+        """Should use default model when none specified."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "message": {"content": '"""Test docstring."""'}
+        }
+        mock_post.return_value = mock_response
+
+        request_data = {"code": "def test(): pass"}
+        response = client.post("/generate", json=request_data)
+
+        assert response.status_code == 200
+
+        # Verify default model was used
+        call_args = mock_post.call_args
+        payload = call_args[1]["json"]
+        default_config = get_model_config(DEFAULT_MODEL_KEY)
+        assert payload["model"] == default_config.ollama_model
+
+
+class TestHealthWithModel:
+    """Tests for health endpoint with model information."""
+
+    @patch("src.training.serve.requests.get")
+    def test_health_reports_active_model(self, mock_get, client):
+        """Health endpoint should report the active model."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        response = client.get("/health")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "active_model" in data
+        assert "ollama_model" in data
+        # Should match the configured model
+        active_model = get_active_model()
+        assert data["active_model"] == active_model.name
+        assert data["ollama_model"] == active_model.ollama_model
