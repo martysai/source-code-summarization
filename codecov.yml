@@ -1,0 +1,11 @@
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+  require_base: no
+  require_head: yes
+
+# Optional: configure thresholds or ignore patterns below
+# coverage:
+#   precision: 2
+#   round: down
